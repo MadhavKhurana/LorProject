@@ -1,0 +1,47 @@
+const express = require("express");
+const mongoose = require("mongoose");
+const users = require("./routes/api/users.js");
+const pdf = require("./routes/api/pdf.js");
+const admin = require("./routes/api/admin.js");
+const passport = require("passport");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const fileUpload = require("express-fileupload");
+
+const app = express();
+
+//Body parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
+
+app.use(fileUpload());
+
+//Db Config
+
+const db = require("./config/keys.js").mongoURI;
+
+//connect to mongodb
+
+mongoose
+  .connect(db)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log(err));
+
+//passport middleware
+app.use(passport.initialize());
+
+//passport config
+require("./config/passport")(passport);
+
+app.get("/", (req, res) => res.send("Hello"));
+
+//Use Routes
+
+app.use("/api/users", users);
+app.use("/api/pdf", pdf);
+app.use("/api/admin", admin);
+
+const port = process.env.PORT || 5000;
+
+app.listen(port, () => console.log(`Running on port ${port}`));
