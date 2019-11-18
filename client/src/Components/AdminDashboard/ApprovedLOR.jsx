@@ -3,16 +3,32 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { logoutUser } from "../../redux/actions/authActions";
+import { getApprovedPdf, previewPDF } from "../../redux/actions/pdfActions";
+import { Document, Page } from "react-pdf/dist/entry.webpack";
 
 class AdminPanel extends Component {
   state = {
-    dashboard: true
+    dashboard: true,
+    Document: "",
+    show: false
+  };
+
+  previewPDFs = e => {
+    const pdffile = this.props.pdf.submittedpdf.filter(item => {
+      return item.pdf == e.target.id;
+    });
+    // const array = pdffile[0].location.split("/");
+    const path = `${pdffile[0].pdf}`;
+
+    this.setState({ Document: path });
+    this.setState({ show: !this.state.show });
   };
 
   componentDidMount() {
     if (this.props.auth.user.isAdmin === "false") {
       this.props.history.push("/user-panel");
     }
+    this.props.getApprovedPdf();
   }
 
   render() {
@@ -96,18 +112,91 @@ class AdminPanel extends Component {
               </div>
               {/* /. ROW  --> */}
               <hr />
-              <div class="row">
-                <div class="col-md-3 col-sm-6 col-xs-6">
-                  <div class="panel panel-back noti-box">
-                    <span class="icon-box bg-color-red set-icon">
-                      <i class="fa fa-envelope-o"></i>
-                    </span>
-                    <div class="text-box">
-                      <p class="main-text">120 New</p>
-                      <p class="text-muted">Messages</p>
-                    </div>
+              <div class="row container-fluid">
+                <table class="table table-hover">
+                  <tbody>
+                    {this.state.loading
+                      ? "Loading"
+                      : this.props.pdf.submittedpdf.map((item, i) => {
+                          if (
+                            item.pdfName ===
+                            "No LOR(s) found. Please create one..."
+                          ) {
+                            return (
+                              <tr>
+                                <td>{item.pdf}</td>
+                              </tr>
+                            );
+                          } else {
+                            if (this.state.show) {
+                              return <div></div>;
+                            } else {
+                              return (
+                                <tr>
+                                  <td>{item.pdf}</td>
+                                  <td>
+                                    {this.state.show ? (
+                                      ""
+                                    ) : (
+                                      <button
+                                        class="btn btn-success"
+                                        id={`${item.pdf}`}
+                                        onClick={this.previewPDFs}
+                                        to={`${item.to}`}
+                                      >
+                                        Preview
+                                      </button>
+                                    )}
+                                  </td>
+                                  <td>
+                                    {/* {this.state.show ? (
+                                      ""
+                                    ) : (
+                                      <button
+                                        to={`${item.to}`}
+                                        class="btn btn-danger"
+                                        id={`${item.pdf}`}
+                                        onClick={this.onPdfSubmit}
+                                      >
+                                        Approve
+                                      </button>
+                                    )} */}
+                                  </td>
+                                </tr>
+                              );
+                            }
+                          }
+                        })}
+                  </tbody>
+                </table>
+              </div>
+              <div align="center" class="container-fluid">
+                {this.state.show ? (
+                  <div>
+                    <Document
+                      file={`./${this.state.Document}`}
+                      onLoadError={console.error}
+                    >
+                      <Page pageNumber={1} />
+                    </Document>
+                    <button
+                      class="btn btn-lg btn-primary"
+                      onClick={() => {
+                        this.setState({ show: false });
+                      }}
+                    >
+                      Done
+                    </button>{" "}
+                    {/* <button
+                      class="btn btn-lg btn-danger"
+                      onClick={this.onPdfSubmit}
+                    >
+                      Submit
+                    </button> */}
                   </div>
-                </div>
+                ) : (
+                  ""
+                )}
               </div>
               {/* /. ROW  --> */}
               <hr />
@@ -132,7 +221,12 @@ AdminPanel.propTypes = {
 
 const mapStatetoProps = state => ({
   auth: state.auth,
-  errors: state.errors
+  errors: state.errors,
+  pdf: state.pdf
 });
 
-export default connect(mapStatetoProps, { logoutUser })(AdminPanel);
+export default connect(mapStatetoProps, {
+  logoutUser,
+  getApprovedPdf,
+  previewPDF
+})(AdminPanel);

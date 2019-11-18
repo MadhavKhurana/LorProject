@@ -53,6 +53,13 @@ class AdminAuth extends Component {
         <form onSubmit={this.LoginSubmit} className="col-md-5">
           <h3>Login</h3>
           <br />
+          {this.props.errors.LoginAdminEmailErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.LoginAdminEmailErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group ">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-user"></i>
@@ -68,6 +75,13 @@ class AdminAuth extends Component {
             />
           </div>
           <br />
+          {this.props.errors.LoginAdminPasswordErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.LoginAdminPasswordErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-lock"></i>

@@ -8,6 +8,7 @@ const path = require("path");
 const AllPdf = require("../../models/pdfModel.js");
 const PdfSubmit = require("../../models/pdfSubmitModel.js");
 const passport = require("passport");
+const PDFParser = require("pdf2json");
 
 router.get("/test", (req, res) => res.json({ msg: "Profile Works" }));
 
@@ -23,19 +24,55 @@ router.post(
       facultyDepartment
     } = req.body;
 
-    if (!fs.existsSync(`routes/api/pdfFiles/${studentName}`)) {
-      fs.mkdirSync(`routes/api/pdfFiles/${studentName}`);
-    }
+    // if (!fs.existsSync(`routes/api/pdfFiles/${studentName}`)) {
+    //   fs.mkdirSync(`routes/api/pdfFiles/${studentName}`);
+    // }
 
-    if (!fs.existsSync(`client/public/pdfFiles/${studentName}`)) {
-      fs.mkdirSync(`client/public/pdfFiles/${studentName}`);
-    }
+    // if (!fs.existsSync(`client/public/pdfFiles/${studentName}`)) {
+    //   fs.mkdirSync(`client/public/pdfFiles/${studentName}`);
+    // }
 
-    const filename =
+    let filename =
       encodeURIComponent(studentName.replace(" ", "-")) +
       "-" +
       encodeURIComponent(teacherName.replace(" ", "-")) +
       "-lor.pdf";
+
+    // const changeName = name => {
+    //   try {
+    //     if (fs.existsSync(`client/public/${name}`)) {
+    //       name = `x.${name}`;
+    //       changeName(name);
+    //     } else {
+    //       return name;
+    //     }
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // };
+
+    for (let i = 0; i < 10; i++) {
+      try {
+        if (fs.existsSync(`client/public/${filename}`)) {
+          filename = `x.${filename}`;
+        } else {
+          filename = filename;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    // filename = changeName(filename);
+    console.log("NAME----------------" + filename);
+
+    // try {
+    //   if (fs.existsSync(`client/public/${filename}`)) {
+    //     filename = `x.${filename}`;
+    //   }
+    // } catch (err) {
+    //   console.log(err);
+    // }
 
     AllPdf.findOne({ user: req.user.id })
       .then(pdf => {
@@ -45,7 +82,8 @@ router.post(
             pdfName: filename,
             location: `routes/api/pdfFiles/${studentName}`,
             to: req.body.temail,
-            isSubmitted: false
+            isSubmitted: false,
+            content: content
           });
 
           pdf
@@ -55,11 +93,16 @@ router.post(
         } else {
           const newPdf = new AllPdf({
             user: req.user.id,
-            LorSubmitted: {
-              name: studentName,
-              pdfName: filename,
-              location: `routes/api/pdfFiles/${studentName}`
-            }
+            LorSubmitted: [
+              {
+                name: studentName,
+                pdfName: filename,
+                location: `routes/api/pdfFiles/${studentName}`,
+                isSubmitted: false,
+                to: req.body.temail,
+                content: content
+              }
+            ]
           });
           newPdf
             .save()
@@ -73,9 +116,8 @@ router.post(
     // const doc = createLOR(new PDFDocument(), studentName, content, teacherName);
 
     var doc = new PDFDocument();
-    var pdfFile = path.join(__dirname + `/pdfFiles/${studentName}`, filename);
+
     var pdfFile2 = path.join(`client/public`, filename);
-    var pdfStream = fs.createWriteStream(pdfFile);
     var pdfStream2 = fs.createWriteStream(pdfFile2);
     doc
       .image("./logoCropped.jpeg", (doc.page.width - 312) / 2, 0, {
@@ -124,7 +166,6 @@ router.post(
       })
       .moveDown();
 
-    doc.pipe(pdfStream);
     doc.pipe(pdfStream2);
     doc.end();
 
@@ -189,11 +230,14 @@ router.post(
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     AllPdf.findOne({ user: req.user.id })
+
       // .populate("user")
       .then(pdf => {
+        let a;
         pdf.LorSubmitted.find(lor => {
           if (lor.pdfName === req.body.pdf) {
             lor.isSubmitted = true;
+            a = lor.content;
           }
         });
         pdf
@@ -203,7 +247,8 @@ router.post(
               to: req.body.to,
               from: req.body.from,
               isApproved: false,
-              pdf: req.body.pdf
+              pdf: req.body.pdf,
+              content: a
             });
 
             Submission.save()
@@ -226,11 +271,117 @@ router.get(
   "/getSubmitedPdf",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    PdfSubmit.find({ to: req.user.email })
+    PdfSubmit.find({ to: req.user.email, isApproved: "false" })
       .then(data => {
         res.json(data);
       })
       .catch(err => console.log(err));
+  }
+);
+
+router.get(
+  "/getApprovedPdf",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    PdfSubmit.find({ to: req.user.email, isApproved: "true" })
+      .then(data => {
+        res.json(data);
+      })
+      .catch(err => console.log(err));
+  }
+);
+
+router.get(
+  "/getsApprovedPdf",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    PdfSubmit.find({ from: req.user.email })
+      .then(data => {
+        res.json(data);
+      })
+      .catch(err => console.log(err));
+  }
+);
+
+router.post(
+  "/ApproveLor",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const {
+      studentName,
+      content,
+      teacherName,
+      facultyDesignation,
+      facultyDepartment,
+      filename,
+      sign
+    } = req.body;
+
+    PdfSubmit.findOne({ pdf: filename }).then(pdfs => {
+      pdfs.isApproved = true;
+
+      pdfs.save().then(data => {
+        var doc = new PDFDocument();
+        var pdfFile2 = path.join(`client/public`, filename);
+        var pdfStream2 = fs.createWriteStream(pdfFile2);
+        doc
+          .image("./logoCropped.jpeg", (doc.page.width - 312) / 2, 0, {
+            fit: [350, 250]
+          })
+          .moveDown()
+          .font("Times-Bold")
+          .fontSize(15)
+
+          .text("Dehmi Kalan, Near GVK Toll Plaza, Jaipur, Rajasthan, 303007", {
+            align: "center"
+          });
+        // .lineGap(0.05)
+        // .text("Department Of Computer Science & Engineering", {
+        //   align: "center"
+        // });
+        doc
+          .strokeColor("#aaaaaa")
+          .lineWidth(1)
+          // .moveTo(50, y)
+          // .lineTo(550, y)
+          .stroke()
+          .moveDown();
+        doc
+          .font("Times-Bold")
+          .fontSize(15)
+          .text("Letter Of Recommendation", {
+            align: "center",
+            underline: "true"
+          })
+          .moveDown();
+        doc
+          .font("Times-Roman")
+          .fontSize(15)
+          .text(content)
+          .moveDown()
+          .image(`client/public/uploads/${sign}`, 430, 580, {
+            fit: [100, 100]
+          });
+        doc.moveDown();
+
+        doc
+          .font("Times-Roman")
+          .fontSize(15)
+          .text(teacherName, 430, 640)
+          .text(`${facultyDesignation}`, 480, 660)
+          .text(`${facultyDepartment}`, 350, 680)
+          .text("Manipal University Jaipur", 380, 700)
+          .moveDown()
+          .moveDown()
+          .moveDown()
+          .moveDown()
+          .moveDown();
+
+        doc.pipe(pdfStream2);
+        doc.end();
+        res.json(data);
+      });
+    });
   }
 );
 

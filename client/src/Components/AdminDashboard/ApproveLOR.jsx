@@ -2,9 +2,10 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { logoutUser } from "../../redux/actions/authActions";
+import { logoutUser, getSignature } from "../../redux/actions/authActions";
 import { getSubmitedPdf, previewPDF } from "../../redux/actions/pdfActions";
 import { Document, Page } from "react-pdf/dist/entry.webpack";
+import axios from "axios";
 
 class AdminPanel extends Component {
   state = {
@@ -12,6 +13,27 @@ class AdminPanel extends Component {
     loading: true,
     Document: "",
     show: false
+  };
+
+  onPdfSubmit = e => {
+    let a;
+    this.props.pdf.submittedpdf.find(lor => {
+      if (lor.to === this.props.auth.user.email) {
+        a = lor.content;
+      }
+    });
+    const data = {
+      filename: e.target.id,
+      teacherName: this.props.auth.user.name,
+      facultyDesignation: this.props.auth.user.designation,
+      facultyDepartment: this.props.auth.user.department,
+      content: a,
+      sign: this.props.auth.signature.fileName
+    };
+    axios
+      .post("/api/pdf/ApproveLor", data)
+      .then(res => {})
+      .catch(err => console.log(err));
   };
 
   previewPDFs = e => {
@@ -30,6 +52,7 @@ class AdminPanel extends Component {
       this.props.history.push("/user-panel");
     }
     this.props.getSubmitedPdf();
+    this.props.getSignature();
   }
 
   componentWillReceiveProps(next) {
@@ -157,7 +180,7 @@ class AdminPanel extends Component {
                                       <button
                                         to={`${item.to}`}
                                         class="btn btn-danger"
-                                        id={`${item.pdfName}`}
+                                        id={`${item.pdf}`}
                                         onClick={this.onPdfSubmit}
                                       >
                                         Approve
@@ -230,5 +253,6 @@ const mapStatetoProps = state => ({
 export default connect(mapStatetoProps, {
   logoutUser,
   getSubmitedPdf,
-  previewPDF
+  previewPDF,
+  getSignature
 })(AdminPanel);

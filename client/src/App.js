@@ -9,6 +9,7 @@ import ApproveLor from "./Components/AdminDashboard/ApproveLOR.jsx";
 import ApprovedLor from "./Components/AdminDashboard/ApprovedLOR.jsx";
 import LorPage from "./Components/UserDashboard/LorPage.jsx";
 import SubmittedLors from "./Components/UserDashboard/SubmittedLors.jsx";
+import AllApprovedLor from "./Components/UserDashboard/ApprovedLor.jsx";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.css";
@@ -47,6 +48,11 @@ class App extends React.Component {
                 exact
                 path="/submitted-lors"
                 component={SubmittedLors}
+              />
+              <PrivateRoute
+                exact
+                path="/all-approved-lors"
+                component={AllApprovedLor}
               />
             </Switch>
           </Router>

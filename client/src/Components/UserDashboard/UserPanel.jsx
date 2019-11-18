@@ -83,6 +83,11 @@ class UserPanel extends Component {
                     <i class="fa fa-qrcode fa-3x"></i> Submitted Lor's
                   </Link>
                 </li>
+                <li>
+                  <Link to="/all-approved-lors">
+                    <i class="fa fa-qrcode fa-3x"></i> Approved Lor's
+                  </Link>
+                </li>
               </ul>
             </div>
           </nav>

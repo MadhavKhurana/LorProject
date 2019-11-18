@@ -274,7 +274,10 @@ class AdminPanel extends Component {
                       formData.append("file", this.state.file);
                       this.props.uploadSignature(formData);
 
-                      window.location.reload();
+                      this.setState({
+                        UploadedFile: null
+                      });
+                      this.props.getSignature();
                     }}
                   >
                     <div class=" custom-file">

@@ -14,7 +14,9 @@ class LorPage extends Component {
     temail: "",
     dep: "",
     des: "",
-    faculty: []
+    faculty: [],
+    count: 0,
+    errContent: ""
   };
 
   componentWillReceiveProps(next) {
@@ -60,20 +62,38 @@ class LorPage extends Component {
     });
   };
 
+  onChanges = e => {
+    let str = this.state.lorcontent;
+    // console.log(str.);
+
+    this.setState({
+      [e.target.name]: e.target.value,
+      count: e.target.value.length
+    });
+  };
+
   onSubmit = e => {
     e.preventDefault();
-    const content = {
-      studentName: this.state.name,
-      content: this.state.lorcontent,
-      teacherName: this.state.teacherName,
-      email: this.props.auth.user.email,
-      facultyDesignation: this.state.des,
-      facultyDepartment: this.state.dep,
-      temail: this.state.temail
-    };
-    // console.log(content);
-
-    this.props.createPDF(content, this.props.history);
+    if (this.state.count <= 1650) {
+      const content = {
+        studentName: this.state.name,
+        content: this.state.lorcontent,
+        teacherName: this.state.teacherName,
+        email: this.props.auth.user.email,
+        facultyDesignation: this.state.des,
+        facultyDepartment: this.state.dep,
+        temail: this.state.temail
+      };
+      // console.log(content);
+      this.setState({
+        errContent: ""
+      });
+      this.props.createPDF(content, this.props.history);
+    } else {
+      this.setState({
+        errContent: "Max number of characters are 1650. Please check the count."
+      });
+    }
   };
 
   componentDidMount() {
@@ -150,6 +170,11 @@ class LorPage extends Component {
                     <i class="fa fa-qrcode fa-3x"></i> Submitted Lor's
                   </Link>
                 </li>
+                <li>
+                  <Link to="/all-approved-lors">
+                    <i class="fa fa-qrcode fa-3x"></i> Approved Lor's
+                  </Link>
+                </li>
               </ul>
             </div>
           </nav>
@@ -184,16 +209,30 @@ class LorPage extends Component {
                     <br />
                     <h3>
                       <label class="pull-left" for="lorcontent">
-                        LOR Content
+                        LOR Content<h6> (max 1650 characters)</h6>
                       </label>
+                      <h6 class="pull-right">
+                        <b>count: {this.state.count}</b>
+                      </h6>
                     </h3>
+                    {this.state.count > 1650 ? (
+                      <div class="alert alert-danger">
+                        <strong>
+                          Max number of characters are 1650. Please check the
+                          count.
+                        </strong>
+                      </div>
+                    ) : (
+                      ""
+                    )}
                     <textarea
                       class="form-control"
                       id="lorcontent"
-                      onChange={this.onChange}
+                      onChange={this.onChanges}
                       placeholder="Enter Content"
                       rows="15"
                       name="lorcontent"
+                      value={this.state.lorcontent}
                     ></textarea>
                     <br />
                     <h3>

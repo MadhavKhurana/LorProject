@@ -3,7 +3,6 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-// const LORController = require("./pdfFiles/DocGenerator");
 const smtpTransport = require("./pdfFiles/smtpTransport").smtpTransport;
 const Admin = require("../../models/adminModel");
 const fs = require("fs");
@@ -11,21 +10,43 @@ const fileUpload = require("express-fileupload");
 
 router.get("/test", (req, res) => res.json({ msg: "User Works" }));
 
+const ValidateEmail = mail => {
+  if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
+    return true;
+  }
+  return false;
+};
+
 router.post("/register-user", (req, res) => {
-  //    const {errors,isValid}=validateRegisterInput(req.body)
-  //
-  //    if(!isValid){
-  //        return res.status(400).json(errors)
-  //    }
+  if (!ValidateEmail(req.body.email)) {
+    res
+      .status(400)
+      .json({ RegisterUserEmailErr: "Please enter valid Email Address!!" });
+  }
+
   if (!req.body.name || req.body.name.length < 3 || req.body.name > 30) {
     res.status(400).json({
-      msg: "Name must be betwwen 2 and 30 characters"
+      RegisterUserNameErr: "Name must be betwwen 2 and 30 characters"
     });
+  }
+
+  if (req.body.password.length < 8) {
+    res.status(400).json({
+      RegisterUserPasswordErr: "Password should be of atleast 8 characters!!"
+    });
+  }
+
+  if (req.body.password !== req.body.cpassword) {
+    res
+      .status(400)
+      .json({ RegisterUserPasswordErr: "Password does not Match" });
   }
 
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json({ email: "Email already Exist" });
+      return res
+        .status(400)
+        .json({ RegisterUserEmailErr: "Email already Exist" });
     } else {
       const newUser = new User({
         name: req.body.name,
@@ -52,9 +73,15 @@ router.post("/login-user", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
+  if (!ValidateEmail(email)) {
+    res
+      .status(400)
+      .json({ LoginUserEmailErr: "Please enter valid Email Address!!" });
+  }
+
   User.findOne({ email }).then(user => {
     if (!user) {
-      return res.status(404).json({ email: "User not found" });
+      return res.status(404).json({ LoginUserEmailErr: "User not found" });
     }
 
     bcrypt.compare(password, user.password).then(isMatch => {
@@ -77,7 +104,9 @@ router.post("/login-user", (req, res) => {
           });
         });
       } else {
-        return res.status(400).json({ passowrd: "Password incorrect" });
+        return res
+          .status(400)
+          .json({ LoginUserPasswordErr: "Password incorrect" });
       }
     });
   });
@@ -104,20 +133,35 @@ router.post(
 );
 
 router.post("/register-admin", (req, res) => {
-  //    const {errors,isValid}=validateRegisterInput(req.body)
-  //
-  //    if(!isValid){
-  //        return res.status(400).json(errors)
-  //    }
+  if (!ValidateEmail(req.body.email)) {
+    res
+      .status(400)
+      .json({ RegisterAdminEmailErr: "Please enter valid Email Address!!" });
+  }
+
   if (!req.body.name || req.body.name.length < 3 || req.body.name > 30) {
     res.status(400).json({
-      msg: "Name must be betwwen 2 and 30 characters"
+      RegisterAdminNameErr: "Name must be betwwen 2 and 30 characters"
     });
+  }
+
+  if (req.body.password.length < 8) {
+    res.status(400).json({
+      RegisterAdminPasswordErr: "Password should be of atleast 8 characters!!"
+    });
+  }
+
+  if (req.body.password !== req.body.cpassword) {
+    res
+      .status(400)
+      .json({ RegisterAdminPasswordErr: "Password does not Match" });
   }
 
   Admin.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json({ email: "Email already Exist" });
+      return res
+        .status(400)
+        .json({ RegisterAdminEmailErr: "Email already Exist" });
     } else {
       const newUser = new Admin({
         name: req.body.name,
@@ -146,9 +190,15 @@ router.post("/login-admin", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
+  if (!ValidateEmail(email)) {
+    res
+      .status(400)
+      .json({ LoginAdminEmailErr: "Please enter valid Email Address!!" });
+  }
+
   Admin.findOne({ email }).then(user => {
     if (!user) {
-      return res.status(404).json({ email: "User not found" });
+      return res.status(404).json({ LoginAdminEmailErr: "User not found" });
     }
 
     bcrypt.compare(password, user.password).then(isMatch => {
@@ -173,7 +223,9 @@ router.post("/login-admin", (req, res) => {
           });
         });
       } else {
-        return res.status(400).json({ passowrd: "Password incorrect" });
+        return res
+          .status(400)
+          .json({ LoginAdminPasswordErr: "Password incorrect" });
       }
     });
   });

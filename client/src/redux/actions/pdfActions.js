@@ -87,3 +87,39 @@ export const getSubmitedPdf = () => dispatch => {
       });
     });
 };
+
+export const getApprovedPdf = () => dispatch => {
+  axios
+    .get("/api/pdf/getApprovedPdf")
+    .then(res => {
+      dispatch({
+        type: "GET_SUBMITTED_PDF",
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      dispatch({
+        type: "GET_ERRORS",
+        payload: err.response.data
+      });
+    });
+};
+
+export const getsApprovedPdf = () => dispatch => {
+  axios
+    .get("/api/pdf/getsApprovedPdf")
+    .then(res => {
+      dispatch({
+        type: "GET_SUBMITTED_PDF",
+        payload: res.data
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      dispatch({
+        type: "GET_ERRORS",
+        payload: err.response.data
+      });
+    });
+};

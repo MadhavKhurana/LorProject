@@ -71,10 +71,18 @@ class UserAuth extends Component {
         <form className="col-md-5" onSubmit={this.LoginSubmit}>
           <h3>Login</h3>
           <br />
+          {this.props.errors.LoginUserEmailErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.LoginUserEmailErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group ">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-user"></i>
             </span>
+
             <input
               id="login_email"
               type="text"
@@ -85,6 +93,13 @@ class UserAuth extends Component {
             />
           </div>
           <br />
+          {this.props.errors.LoginUserPasswordErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.LoginUserPasswordErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-lock"></i>
@@ -126,6 +141,13 @@ class UserAuth extends Component {
         <form className="col-md-5" onSubmit={this.RegisterSubmit}>
           <h3>Register</h3>
           <br />
+          {this.props.errors.RegisterUserNameErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterUserNameErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group ">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-user"></i>
@@ -140,6 +162,13 @@ class UserAuth extends Component {
             />
           </div>
           <br />
+          {this.props.errors.RegisterUserEmailErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterUserEmailErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group ">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-user"></i>
@@ -154,6 +183,13 @@ class UserAuth extends Component {
             />
           </div>
           <br />
+          {this.props.errors.RegisterUserPasswordErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterUserPasswordErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-lock"></i>
@@ -169,6 +205,13 @@ class UserAuth extends Component {
             />
           </div>
           <br />
+          {this.props.errors.RegisterUserPasswordErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterUserPasswordErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
           <div className="input-group">
             <span className="input-group-addon">
               <i className="glyphicon glyphicon-lock"></i>
@@ -218,7 +261,4 @@ const mapStatetoProps = state => ({
   errors: state.errors
 });
 
-export default connect(
-  mapStatetoProps,
-  { loginUser, registerUser }
-)(UserAuth);
+export default connect(mapStatetoProps, { loginUser, registerUser })(UserAuth);

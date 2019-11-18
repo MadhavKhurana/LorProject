@@ -30,6 +30,10 @@ const PdfModel = new Schema({
       isSubmitted: {
         type: String,
         required: true
+      },
+      content: {
+        type: String,
+        required: true
       }
     }
   ]
