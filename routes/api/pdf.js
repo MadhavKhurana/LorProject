@@ -9,6 +9,7 @@ const AllPdf = require("../../models/pdfModel.js");
 const PdfSubmit = require("../../models/pdfSubmitModel.js");
 const passport = require("passport");
 const PDFParser = require("pdf2json");
+const nodemailer = require("nodemailer");
 
 router.get("/test", (req, res) => res.json({ msg: "Profile Works" }));
 
@@ -255,6 +256,24 @@ router.post(
               .then(data => {
                 AllPdf.findOne({ user: req.user.id })
                   .then(data => {
+                    ////// SEND MAIL TO ADMIN
+
+                    const mailOptions = {
+                      to: req.body.to,
+                      from: "testemailidformail@gmail.com",
+                      subject: "Student LOR submitted",
+                      text:
+                        "Please check and approve the LOR. <LINK_OF_WEBSITE>"
+                      // attachments: [
+                      //   {
+                      //     filename: filename,
+                      //     path: ""
+                      //   }
+                      // ]
+                    };
+
+                    smtpTransport.sendMail(mailOptions);
+
                     // console.log(data);
                     res.json(data.LorSubmitted);
                   })
@@ -379,6 +398,22 @@ router.post(
 
         doc.pipe(pdfStream2);
         doc.end();
+
+        const mailOptions = {
+          to: req.body.from,
+          from: "testemailidformail@gmail.com",
+          subject: "LOR approved",
+          text: "Please check. <LINK_OF_WEBSITE>",
+          attachments: [
+            {
+              filename: filename,
+              path: `client/public/${filename}`
+            }
+          ]
+        };
+
+        smtpTransport.sendMail(mailOptions);
+
         res.json(data);
       });
     });

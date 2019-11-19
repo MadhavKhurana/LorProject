@@ -17,9 +17,11 @@ class AdminPanel extends Component {
 
   onPdfSubmit = e => {
     let a;
+    let studentEmail;
     this.props.pdf.submittedpdf.find(lor => {
       if (lor.to === this.props.auth.user.email) {
         a = lor.content;
+        studentEmail = lor.from;
       }
     });
     const data = {
@@ -28,7 +30,8 @@ class AdminPanel extends Component {
       facultyDesignation: this.props.auth.user.designation,
       facultyDepartment: this.props.auth.user.department,
       content: a,
-      sign: this.props.auth.signature.fileName
+      sign: this.props.auth.signature.fileName,
+      from: studentEmail
     };
     axios
       .post("/api/pdf/ApproveLor", data)

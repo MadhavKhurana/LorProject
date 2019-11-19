@@ -122,6 +122,13 @@ class LorPage extends Component {
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
+                {this.props.errors.LoginUserEmailErr ? (
+                  <div class="alert alert-danger">
+                    <strong>{this.props.errors.LoginUserEmailErr}</strong>
+                  </div>
+                ) : (
+                  ""
+                )}{" "}
                 <span class="icon-bar"></span>
               </button>
               <a class="navbar-brand" href="index.html"></a>
