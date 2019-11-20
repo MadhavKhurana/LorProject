@@ -5,7 +5,7 @@
   "proxy": "http://localhost:5000/",
   "scripts": {
     "client-install": "npm install --prefix client",
-    "start": "yarn server.js",
+    "start": "node server.js",
     "server": "nodemon server.js",
     "client": "cd client && yarn start",
     "dev": "concurrently \"yarn run server\" \"yarn run client\"",

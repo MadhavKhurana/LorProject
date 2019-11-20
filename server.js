@@ -34,8 +34,6 @@ app.use(passport.initialize());
 //passport config
 require("./config/passport")(passport);
 
-app.get("/", (req, res) => res.send("Hello"));
-
 //Use Routes
 
 app.use("/api/users", users);
@@ -50,6 +48,6 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 app.listen(port, () => console.log(`Running on port ${port}`));
