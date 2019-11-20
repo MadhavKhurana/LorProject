@@ -42,31 +42,42 @@ router.post("/register-user", (req, res) => {
       .json({ RegisterUserPasswordErr: "Password does not Match" });
   }
 
-  User.findOne({ email: req.body.email }).then(user => {
-    if (user) {
-      return res
-        .status(400)
-        .json({ RegisterUserEmailErr: "Email already Exist" });
-    } else {
-      const newUser = new User({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        isAdmin: false
-      });
-
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser
-            .save()
-            .then(user => res.json(user))
-            .catch(err => console.log(err));
+  if (
+    req.body.password !== req.body.cpassword ||
+    req.body.password.length < 8 ||
+    !req.body.name ||
+    req.body.name.length < 3 ||
+    req.body.name > 30 ||
+    !ValidateEmail(req.body.email)
+  ) {
+    console.log("error");
+  } else {
+    User.findOne({ email: req.body.email }).then(user => {
+      if (user) {
+        return res
+          .status(400)
+          .json({ RegisterUserEmailErr: "Email already Exist" });
+      } else {
+        const newUser = new User({
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          isAdmin: false
         });
-      });
-    }
-  });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) throw err;
+            newUser.password = hash;
+            newUser
+              .save()
+              .then(user => res.json(user))
+              .catch(err => console.log(err));
+          });
+        });
+      }
+    });
+  }
 });
 
 router.post("/login-user", (req, res) => {
@@ -154,36 +165,47 @@ router.post("/register-admin", (req, res) => {
   if (req.body.password !== req.body.cpassword) {
     res
       .status(400)
-      .json({ RegisterAdminPasswordErr: "Password does not Match" });
+      .json({ RegisterAdminCPasswordErr: "Password does not Match" });
   }
 
-  Admin.findOne({ email: req.body.email }).then(user => {
-    if (user) {
-      return res
-        .status(400)
-        .json({ RegisterAdminEmailErr: "Email already Exist" });
-    } else {
-      const newUser = new Admin({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
-        isAdmin: true,
-        department: "",
-        designation: ""
-      });
-
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          newUser
-            .save()
-            .then(user => res.json(user))
-            .catch(err => console.log(err));
+  if (
+    req.body.password !== req.body.cpassword ||
+    req.body.password.length < 8 ||
+    !req.body.name ||
+    req.body.name.length < 3 ||
+    req.body.name > 30 ||
+    !ValidateEmail(req.body.email)
+  ) {
+    console.log("error");
+  } else {
+    Admin.findOne({ email: req.body.email }).then(user => {
+      if (user) {
+        return res
+          .status(400)
+          .json({ RegisterAdminEmailErr: "Email already Exist" });
+      } else {
+        const newUser = new Admin({
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          isAdmin: true,
+          department: "",
+          designation: ""
         });
-      });
-    }
-  });
+
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) throw err;
+            newUser.password = hash;
+            newUser
+              .save()
+              .then(user => res.json(user))
+              .catch(err => console.log(err));
+          });
+        });
+      }
+    });
+  }
 });
 
 router.post("/login-admin", (req, res) => {

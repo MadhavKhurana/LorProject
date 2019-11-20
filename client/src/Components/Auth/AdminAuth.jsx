@@ -1,12 +1,28 @@
 import React, { Component } from "react";
-import { loginAdmin } from "../../redux/actions/authActions";
+import { loginAdmin, registerAdmin } from "../../redux/actions/authActions";
 import { connect } from "react-redux";
 
 class AdminAuth extends Component {
   state = {
     login: true,
     email: "",
-    password: ""
+    password: "",
+    register_email: "",
+    register_name: "",
+    register_password: "",
+    register_cpassword: ""
+  };
+
+  RegisterSubmit = e => {
+    e.preventDefault();
+    const registerData = {
+      email: this.state.register_email,
+      password: this.state.register_password,
+      name: this.state.register_name,
+      cpassword: this.state.register_cpassword
+    };
+    // console.log(registerData);
+    this.props.registerAdmin(registerData, this.props.history);
   };
 
   componentDidMount() {
@@ -98,7 +114,13 @@ class AdminAuth extends Component {
             />
           </div>
           <br />
-
+          <span
+            onClick={() => this.setState({ login: false })}
+            className="pull-left"
+            style={{ cursor: "pointer", color: "blue" }}
+          >
+            Create a account..
+          </span>
           <button type="submit" className="pull-right btn btn-lg btn-primary">
             Login
           </button>
@@ -107,85 +129,117 @@ class AdminAuth extends Component {
     );
   };
 
-  //   registerInputs = () => {
-  //     return (
-  //       <div>
-  //         <br />
-  //         <br />
-  //         <br />
-  //         <div className="col-md-3"></div>
+  registerInputs = () => {
+    return (
+      <div>
+        <br />
+        <br />
+        <br />
+        <div className="col-md-3"></div>
 
-  //         <form className="col-md-5">
-  //           <h3>Register</h3>
-  //           <br />
-  //           <div className="input-group ">
-  //             <span className="input-group-addon">
-  //               <i className="glyphicon glyphicon-user"></i>
-  //             </span>
-  //             <input
-  //               id="name"
-  //               type="text"
-  //               className="form-control"
-  //               name="name"
-  //               onChange={this.onChange} placeholder="Full Name"
-  //             />
-  //           </div>
-  //           <br />
-  //           <div className="input-group ">
-  //             <span className="input-group-addon">
-  //               <i className="glyphicon glyphicon-user"></i>
-  //             </span>
-  //             <input
-  //               id="email"
-  //               type="text"
-  //               className="form-control"
-  //               name="email"
-  //               onChange={this.onChange} placeholder="Email"
-  //             />
-  //           </div>
-  //           <br />
-  //           <div className="input-group">
-  //             <span className="input-group-addon">
-  //               <i className="glyphicon glyphicon-lock"></i>
-  //             </span>
+        <form onSubmit={this.RegisterSubmit} className="col-md-5">
+          <h3>Register</h3>
+          <br />
+          {this.props.errors.RegisterAdminNameErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterAdminNameErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
+          <div className="input-group ">
+            <span className="input-group-addon">
+              <i className="glyphicon glyphicon-user"></i>
+            </span>
+            <input
+              id="name"
+              type="text"
+              className="form-control"
+              name="register_name"
+              onChange={this.onChange}
+              placeholder="Full Name"
+            />
+          </div>
+          <br />
+          {this.props.errors.RegisterAdminEmailErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterAdminEmailErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
+          <div className="input-group ">
+            <span className="input-group-addon">
+              <i className="glyphicon glyphicon-user"></i>
+            </span>
+            <input
+              id="email"
+              type="text"
+              className="form-control"
+              name="register_email"
+              onChange={this.onChange}
+              placeholder="Email"
+            />
+          </div>
+          <br />
+          {this.props.errors.RegisterAdminPasswordErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterAdminPasswordErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
+          <div className="input-group">
+            <span className="input-group-addon">
+              <i className="glyphicon glyphicon-lock"></i>
+            </span>
 
-  //             <input
-  //               id="password"
-  //               type="password"
-  //               className="form-control"
-  //               name="password"
-  //               onChange={this.onChange} placeholder="Password"
-  //             />
-  //           </div>
-  //           <br />
-  //           <div className="input-group">
-  //             <span className="input-group-addon">
-  //               <i className="glyphicon glyphicon-lock"></i>
-  //             </span>
+            <input
+              id="password"
+              type="password"
+              className="form-control"
+              name="register_password"
+              onChange={this.onChange}
+              placeholder="Password"
+            />
+          </div>
+          <br />
+          {this.props.errors.RegisterAdminCPasswordErr ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.RegisterAdminCPasswordErr}</strong>
+            </div>
+          ) : (
+            ""
+          )}
+          <div className="input-group">
+            <span className="input-group-addon">
+              <i className="glyphicon glyphicon-lock"></i>
+            </span>
 
-  //             <input
-  //               id="password"
-  //               type="password"
-  //               className="form-control"
-  //               name="password"
-  //               onChange={this.onChange} placeholder="Confirm Password"
-  //             />
-  //           </div>
-  //           <br />
-  //           <span
-  //             onClick={() => this.setState({ login: true })}
-  //             className="pull-left"
-  //             style={{ cursor: "pointer", color: "blue" }}
-  //           >
-  //             Login Here..
-  //           </span>
-  //           <button className="pull-right btn btn-lg btn-primary">
-  //             Register
-  //           </button>
-  //         </form>
-  //       </div>
-  //     );
-  //   };
+            <input
+              id="password"
+              type="password"
+              className="form-control"
+              name="register_cpassword"
+              onChange={this.onChange}
+              placeholder="Confirm Password"
+            />
+          </div>
+          <br />
+          <span
+            onClick={() => this.setState({ login: true })}
+            className="pull-left"
+            style={{ cursor: "pointer", color: "blue" }}
+          >
+            Login Here..
+          </span>
+          <button className="pull-right btn btn-lg btn-primary">
+            Register
+          </button>
+        </form>
+      </div>
+    );
+  };
 
   render() {
     return (
@@ -195,7 +249,7 @@ class AdminAuth extends Component {
           <br />
           <br />
           <br />
-          {this.loginInputs()}
+          {this.state.login ? this.loginInputs() : this.registerInputs()}
         </div>
       </div>
     );
@@ -207,4 +261,6 @@ const mapStatetoProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStatetoProps, { loginAdmin })(AdminAuth);
+export default connect(mapStatetoProps, { registerAdmin, loginAdmin })(
+  AdminAuth
+);

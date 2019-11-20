@@ -5,7 +5,21 @@ import jwt_decode from "jwt-decode";
 export const registerUser = (userData, history) => dispatch => {
   axios
     .post("/api/users/register-user", userData)
-    .then(res => history.push("/login-user"))
+    .then(res => history.push("/student-login"))
+    .catch(err => {
+      console.log(err);
+
+      dispatch({
+        type: "GET_ERRORS",
+        payload: err.response.data
+      });
+    });
+};
+
+export const registerAdmin = (userData, history) => dispatch => {
+  axios
+    .post("/api/users/register-admin", userData)
+    .then(res => history.push("/admin-login"))
     .catch(err => {
       console.log(err);
 
