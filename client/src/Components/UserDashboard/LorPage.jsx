@@ -131,7 +131,7 @@ class LorPage extends Component {
                 )}{" "}
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="index.html"></a>
+              {/* <a class="navbar-brand" href="index.html"></a> */}
             </div>
             <div
               style={{

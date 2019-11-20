@@ -33,12 +33,12 @@ class Home extends Component {
                 <span class="icon-bar"></span>
               </button>
 
-              <a
+              <span
                 class="navbar-brand"
                 style={{ height: "50%", backgroundColor: "white" }}
               >
                 <img src={require("./Assets/logo.png")} />
-              </a>
+              </span>
             </div>
             <div class="collapse navbar-collapse" id="myNavbar">
               <ul class="nav navbar-nav navbar-right">

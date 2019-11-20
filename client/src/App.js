@@ -11,7 +11,12 @@ import LorPage from "./Components/UserDashboard/LorPage.jsx";
 import SubmittedLors from "./Components/UserDashboard/SubmittedLors.jsx";
 import AllApprovedLor from "./Components/UserDashboard/ApprovedLor.jsx";
 import { Provider } from "react-redux";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  HashRouter
+} from "react-router-dom";
 import "./App.css";
 import setAuthToken from "./utils/setAuthToken.js";
 import stores from "./store.js";
@@ -28,8 +33,8 @@ if (localStorage.jwtTokenMujLor) {
 class App extends React.Component {
   render() {
     return (
-      <Provider store={stores}>
-        <div className="App">
+      <HashRouter>
+        <Provider store={stores}>
           <Router>
             <Switch>
               <Route exact path="/" component={HomePage} />
@@ -57,8 +62,8 @@ class App extends React.Component {
               />
             </Switch>
           </Router>
-        </div>
-      </Provider>
+        </Provider>
+      </HashRouter>
     );
   }
 }
