@@ -271,12 +271,18 @@ router.get(
   (req, res) => {
     Admin.find({})
       .then(admins => {
+        let x = [];
         admins.filter(admin => {
+          // console.log(admin.department.length);
+
           if (admin.department !== "" && admin.designation !== "") {
+            x.push(admin);
             return admin;
           }
         });
-        res.json(admins);
+        console.log(x);
+
+        res.json(x);
       })
       .catch(err => console.log(err));
   }
