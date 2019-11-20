@@ -31,10 +31,11 @@ class App extends React.Component {
       <Provider store={stores}>
         <div className="App">
           <Router>
-            <Route exact path="/" component={HomePage} />
-            <Route exact path="/student-login" component={UserAuth} />
-            <Route exact path="/admin-login" component={AdminAuth} />
             <Switch>
+              <Route exact path="/" component={HomePage} />
+              <Route exact path="/student-login" component={UserAuth} />
+              <Route exact path="/admin-login" component={AdminAuth} />
+
               <PrivateRoute exact path="/admin-panel" component={AdminPanel} />
               <PrivateRoute exact path="/user-panel" component={UserPanel} />
               <PrivateRoute exact path="/generate-lor" component={LorPage} />
