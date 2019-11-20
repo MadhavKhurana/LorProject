@@ -7,88 +7,53 @@ const smtpTransport = require("./pdfFiles/smtpTransport").smtpTransport;
 const Admin = require("../../models/adminModel");
 const fs = require("fs");
 const fileUpload = require("express-fileupload");
-
-router.get("/test", (req, res) => res.json({ msg: "User Works" }));
-
-const ValidateEmail = mail => {
-  if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(mail)) {
-    return true;
-  }
-  return false;
-};
+const validateRegisterInput = require("./validation/register.js");
+const validateLoginInput = require("./validation/login.js");
 
 router.post("/register-user", (req, res) => {
-  if (!ValidateEmail(req.body.email)) {
-    res
-      .status(400)
-      .json({ RegisterUserEmailErr: "Please enter valid Email Address!!" });
+  const { errors, isValid } = validateRegisterInput(req.body);
+
+  if (!isValid) {
+    return res.status(400).json(errors);
   }
 
-  if (!req.body.name || req.body.name.length < 3 || req.body.name > 30) {
-    res.status(400).json({
-      RegisterUserNameErr: "Name must be betwwen 2 and 30 characters"
-    });
-  }
+  User.findOne({ email: req.body.email }).then(user => {
+    if (user) {
+      return res
+        .status(400)
+        .json({ RegisterUserEmailErr: "Email already Exist" });
+    } else {
+      const newUser = new User({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        isAdmin: false
+      });
 
-  if (req.body.password.length < 8) {
-    res.status(400).json({
-      RegisterUserPasswordErr: "Password should be of atleast 8 characters!!"
-    });
-  }
-
-  if (req.body.password !== req.body.cpassword) {
-    res
-      .status(400)
-      .json({ RegisterUserPasswordErr: "Password does not Match" });
-  }
-
-  if (
-    req.body.password !== req.body.cpassword ||
-    req.body.password.length < 8 ||
-    !req.body.name ||
-    req.body.name.length < 3 ||
-    req.body.name > 30 ||
-    !ValidateEmail(req.body.email)
-  ) {
-    console.log("error");
-  } else {
-    User.findOne({ email: req.body.email }).then(user => {
-      if (user) {
-        return res
-          .status(400)
-          .json({ RegisterUserEmailErr: "Email already Exist" });
-      } else {
-        const newUser = new User({
-          name: req.body.name,
-          email: req.body.email,
-          password: req.body.password,
-          isAdmin: false
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          if (err) throw err;
+          newUser.password = hash;
+          newUser
+            .save()
+            .then(user => res.json(user))
+            .catch(err => console.log(err));
         });
-
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            newUser
-              .save()
-              .then(user => res.json(user))
-              .catch(err => console.log(err));
-          });
-        });
-      }
-    });
-  }
+      });
+    }
+  });
+  // }
 });
 
 router.post("/login-user", (req, res) => {
+  const { errors, isValid } = validateLoginInput(req.body);
+
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
   const email = req.body.email;
   const password = req.body.password;
-
-  if (!ValidateEmail(email)) {
-    res
-      .status(400)
-      .json({ LoginUserEmailErr: "Please enter valid Email Address!!" });
-  }
 
   User.findOne({ email }).then(user => {
     if (!user) {
@@ -144,79 +109,83 @@ router.post(
 );
 
 router.post("/register-admin", (req, res) => {
-  if (!ValidateEmail(req.body.email)) {
-    res
-      .status(400)
-      .json({ RegisterAdminEmailErr: "Please enter valid Email Address!!" });
-  }
+  const { errors, isValid } = validateRegisterInput(req.body);
 
-  if (!req.body.name || req.body.name.length < 3 || req.body.name > 30) {
-    res.status(400).json({
-      RegisterAdminNameErr: "Name must be betwwen 2 and 30 characters"
-    });
+  if (!isValid) {
+    return res.status(400).json(errors);
   }
+  // if (!ValidateEmail(req.body.email)) {
+  //   res
+  //     .status(400)
+  //     .json({ RegisterAdminEmailErr: "Please enter valid Email Address!!" });
+  // }
 
-  if (req.body.password.length < 8) {
-    res.status(400).json({
-      RegisterAdminPasswordErr: "Password should be of atleast 8 characters!!"
-    });
-  }
+  // if (!req.body.name || req.body.name.length < 3 || req.body.name > 30) {
+  //   res.status(400).json({
+  //     RegisterAdminNameErr: "Name must be betwwen 2 and 30 characters"
+  //   });
+  // }
 
-  if (req.body.password !== req.body.cpassword) {
-    res
-      .status(400)
-      .json({ RegisterAdminCPasswordErr: "Password does not Match" });
-  }
+  // if (req.body.password.length < 8) {
+  //   res.status(400).json({
+  //     RegisterAdminPasswordErr: "Password should be of atleast 8 characters!!"
+  //   });
+  // }
 
-  if (
-    req.body.password !== req.body.cpassword ||
-    req.body.password.length < 8 ||
-    !req.body.name ||
-    req.body.name.length < 3 ||
-    req.body.name > 30 ||
-    !ValidateEmail(req.body.email)
-  ) {
-    console.log("error");
-  } else {
-    Admin.findOne({ email: req.body.email }).then(user => {
-      if (user) {
-        return res
-          .status(400)
-          .json({ RegisterAdminEmailErr: "Email already Exist" });
-      } else {
-        const newUser = new Admin({
-          name: req.body.name,
-          email: req.body.email,
-          password: req.body.password,
-          isAdmin: true,
-          department: "",
-          designation: ""
+  // if (req.body.password !== req.body.cpassword) {
+  //   res
+  //     .status(400)
+  //     .json({ RegisterAdminCPasswordErr: "Password does not Match" });
+  // }
+
+  // if (
+  //   req.body.password !== req.body.cpassword ||
+  //   req.body.password.length < 8 ||
+  //   !req.body.name ||
+  //   req.body.name.length < 3 ||
+  //   req.body.name > 30 ||
+  //   !ValidateEmail(req.body.email)
+  // ) {
+  //   console.log("error");
+  // } else {
+  Admin.findOne({ email: req.body.email }).then(user => {
+    if (user) {
+      return res
+        .status(400)
+        .json({ RegisterAdminEmailErr: "Email already Exist" });
+    } else {
+      const newUser = new Admin({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        isAdmin: true,
+        department: "",
+        designation: ""
+      });
+
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          if (err) throw err;
+          newUser.password = hash;
+          newUser
+            .save()
+            .then(user => res.json(user))
+            .catch(err => console.log(err));
         });
-
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            newUser
-              .save()
-              .then(user => res.json(user))
-              .catch(err => console.log(err));
-          });
-        });
-      }
-    });
-  }
+      });
+    }
+  });
+  // }
 });
 
 router.post("/login-admin", (req, res) => {
+  const { errors, isValid } = validateLoginInput(req.body);
+
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
   const email = req.body.email;
   const password = req.body.password;
-
-  if (!ValidateEmail(email)) {
-    res
-      .status(400)
-      .json({ LoginAdminEmailErr: "Please enter valid Email Address!!" });
-  }
 
   Admin.findOne({ email }).then(user => {
     if (!user) {

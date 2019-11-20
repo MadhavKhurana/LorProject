@@ -71,9 +71,9 @@ class UserAuth extends Component {
         <form className="col-md-5" onSubmit={this.LoginSubmit}>
           <h3>Login</h3>
           <br />
-          {this.props.errors.LoginUserEmailErr ? (
+          {this.props.errors.email ? (
             <div class="alert alert-danger">
-              <strong>{this.props.errors.LoginUserEmailErr}</strong>
+              <strong>{this.props.errors.email}</strong>
             </div>
           ) : (
             ""
@@ -93,6 +93,16 @@ class UserAuth extends Component {
             />
           </div>
           <br />
+          {this.props.errors.password ? (
+            <div class="alert alert-danger">
+              <strong>
+                {this.props.errors.password}
+                {this.props.errors.LoginUserPasswordErr}
+              </strong>
+            </div>
+          ) : (
+            ""
+          )}
           {this.props.errors.LoginUserPasswordErr ? (
             <div class="alert alert-danger">
               <strong>{this.props.errors.LoginUserPasswordErr}</strong>
@@ -141,9 +151,9 @@ class UserAuth extends Component {
         <form className="col-md-5" onSubmit={this.RegisterSubmit}>
           <h3>Register</h3>
           <br />
-          {this.props.errors.RegisterUserNameErr ? (
+          {this.props.errors.name ? (
             <div class="alert alert-danger">
-              <strong>{this.props.errors.RegisterUserNameErr}</strong>
+              <strong>{this.props.errors.name}</strong>
             </div>
           ) : (
             ""
@@ -162,6 +172,13 @@ class UserAuth extends Component {
             />
           </div>
           <br />
+          {this.props.errors.email ? (
+            <div class="alert alert-danger">
+              <strong>{this.props.errors.email}</strong>
+            </div>
+          ) : (
+            ""
+          )}{" "}
           {this.props.errors.RegisterUserEmailErr ? (
             <div class="alert alert-danger">
               <strong>{this.props.errors.RegisterUserEmailErr}</strong>
@@ -183,9 +200,9 @@ class UserAuth extends Component {
             />
           </div>
           <br />
-          {this.props.errors.RegisterUserPasswordErr ? (
+          {this.props.errors.password ? (
             <div class="alert alert-danger">
-              <strong>{this.props.errors.RegisterUserPasswordErr}</strong>
+              <strong>{this.props.errors.password}</strong>
             </div>
           ) : (
             ""
@@ -205,9 +222,9 @@ class UserAuth extends Component {
             />
           </div>
           <br />
-          {this.props.errors.RegisterUserPasswordErr ? (
+          {this.props.errors.password2 ? (
             <div class="alert alert-danger">
-              <strong>{this.props.errors.RegisterUserPasswordErr}</strong>
+              <strong>{this.props.errors.password2}</strong>
             </div>
           ) : (
             ""
