@@ -33,37 +33,33 @@ if (localStorage.jwtTokenMujLor) {
 class App extends React.Component {
   render() {
     return (
-      <HashRouter>
-        <Provider store={stores}>
-          <Router>
-            <Switch>
-              <Route exact path="/" component={HomePage} />
-              <Route exact path="/student-login" component={UserAuth} />
-              <Route exact path="/admin-login" component={AdminAuth} />
+      // <>
+      <Provider store={stores}>
+        <HashRouter>
+          <Switch>
+            <Route exact path="/" component={HomePage} />
+            <Route exact path="/student-login" component={UserAuth} />
+            <Route exact path="/admin-login" component={AdminAuth} />
 
-              <PrivateRoute exact path="/admin-panel" component={AdminPanel} />
-              <PrivateRoute exact path="/user-panel" component={UserPanel} />
-              <PrivateRoute exact path="/generate-lor" component={LorPage} />
-              <PrivateRoute exact path="/approve-lor" component={ApproveLor} />
-              <PrivateRoute
-                exact
-                path="/approved-lors"
-                component={ApprovedLor}
-              />
-              <PrivateRoute
-                exact
-                path="/submitted-lors"
-                component={SubmittedLors}
-              />
-              <PrivateRoute
-                exact
-                path="/all-approved-lors"
-                component={AllApprovedLor}
-              />
-            </Switch>
-          </Router>
-        </Provider>
-      </HashRouter>
+            <PrivateRoute exact path="/admin-panel" component={AdminPanel} />
+            <PrivateRoute exact path="/user-panel" component={UserPanel} />
+            <PrivateRoute exact path="/generate-lor" component={LorPage} />
+            <PrivateRoute exact path="/approve-lor" component={ApproveLor} />
+            <PrivateRoute exact path="/approved-lors" component={ApprovedLor} />
+            <PrivateRoute
+              exact
+              path="/submitted-lors"
+              component={SubmittedLors}
+            />
+            <PrivateRoute
+              exact
+              path="/all-approved-lors"
+              component={AllApprovedLor}
+            />
+          </Switch>
+        </HashRouter>
+      </Provider>
+      // </>
     );
   }
 }
