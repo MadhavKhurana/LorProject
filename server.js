@@ -41,7 +41,7 @@ app.use("/api/pdf", pdf);
 app.use("/api/admin", admin);
 
 // var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-const port = process.env.port || 5000;
+const port = process.env.port || 8081;
 
 // if (port === process.env.OPENSHIFT_NODEJS_PORT) {
 app.use(express.static("client/build"));
