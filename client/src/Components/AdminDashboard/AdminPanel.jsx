@@ -20,7 +20,9 @@ class AdminPanel extends Component {
     file: "",
     fileName: "Choose File",
     UploadedFile: {},
-    random: 2
+    random: 2,
+    uploaded: false,
+    PleaseWait: ""
   };
 
   componentWillReceiveProps(next) {
@@ -275,27 +277,13 @@ class AdminPanel extends Component {
                       this.props.uploadSignature(formData);
 
                       this.setState({
-                        UploadedFile: null
+                        UploadedFile: null,
+                        PleaseWait: "a"
                       });
                       this.props.getSignature();
                     }}
                   >
                     <div class=" custom-file">
-                      {/* <input
-                        value={this.state.sign}
-                        id="file-id"
-                        class=" pull-left"
-                        type="file"
-                        name="myImage"
-                        onChange={e => {
-                          this.setState({
-                            sign: document.getElementById("file-id").files[0]
-                          });
-                        }}
-                      />
-                      <button class="pull-right btn " type="submit">
-                        Upload
-                      </button> */}
                       <input
                         type="file"
                         class="custom-file-input"
@@ -315,12 +303,21 @@ class AdminPanel extends Component {
                       />
                     </div>
                   </form>
+                  {this.state.PleaseWait != "" ? (
+                    <div class="alert alert-success">
+                      <strong>
+                        Please wait! while your signature is being uploaded
+                      </strong>
+                    </div>
+                  ) : (
+                    <div />
+                  )}
                   {this.state.UploadedFile ? (
                     <div class="row mt-5">
                       <img
                         class="img-responsive img-circle"
                         style={{ height: "50%", width: "50%" }}
-                        src={this.state.UploadedFile.filePath}
+                        src={`https://alllor.s3.ap-south-1.amazonaws.com/${this.props.auth.user.id}`}
                       />
                     </div>
                   ) : (

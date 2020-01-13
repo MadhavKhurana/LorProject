@@ -7,24 +7,30 @@ const passport = require("passport");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
+const crypto = require("crypto");
+const multer = require("multer");
+const GridFsStorage = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
+const methodOverride = require("method-override");
+const path = require("path");
+const AWS = require("aws-sdk");
 
 const app = express();
 
 //Body parser middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(methodOverride("_method"));
 app.use(cors());
 
 app.use(fileUpload());
 
 //Db Config
 
-const db = require("./config/keys.js").mongoURI;
-
-//connect to mongodb
+const d = require("./config/keys.js").mongoURI;
 
 mongoose
-  .connect(db)
+  .connect(d)
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
@@ -39,17 +45,14 @@ require("./config/passport")(passport);
 app.use("/api/users", users);
 app.use("/api/pdf", pdf);
 app.use("/api/admin", admin);
-
 // var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-const port = process.env.port || 8081;
+const port = process.env.port || 2000;
 
 // if (port === process.env.OPENSHIFT_NODEJS_PORT) {
-app.use(express.static("client/build"));
+// app.use(express.static("client/build"));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+// });
 // }
-app.listen(port, () =>
-  console.log(`Running on port ${port} and ${server_ip_address}`)
-);
+app.listen(port, () => console.log(`Running on port ${port} `));

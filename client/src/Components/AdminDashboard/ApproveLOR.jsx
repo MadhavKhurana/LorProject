@@ -12,9 +12,17 @@ class AdminPanel extends Component {
     dashboard: true,
     loading: true,
     Document: "",
-    show: false
+    show: false,
+    editMode: false,
+    count: 0,
+    lorcontent: "a"
   };
-
+  EditMode = () => {
+    this.setState({
+      editMode: !this.state.editMode,
+      lorcontent: this.props.pdf.submittedpdf.content
+    });
+  };
   onPdfSubmit = e => {
     let a;
     let studentEmail;
@@ -37,6 +45,16 @@ class AdminPanel extends Component {
       .post("/api/pdf/ApproveLor", data)
       .then(res => {})
       .catch(err => console.log(err));
+  };
+
+  onChanges = e => {
+    let str = this.state.lorcontent;
+    // console.log(str.);
+
+    this.setState({
+      [e.target.name]: e.target.value,
+      count: e.target.value.length
+    });
   };
 
   previewPDFs = e => {
@@ -141,91 +159,111 @@ class AdminPanel extends Component {
               <h2>Approve LOR(s)</h2>
               <hr />
               <div class="row container-fluid">
-                <table class="table table-hover">
-                  <tbody>
-                    {this.state.loading
-                      ? "Loading"
-                      : this.props.pdf.submittedpdf.map((item, i) => {
-                          if (
-                            item.pdfName ===
-                            "No LOR(s) found. Please create one..."
-                          ) {
-                            return (
-                              <tr>
-                                <td>{item.pdf}</td>
-                              </tr>
-                            );
-                          } else {
-                            if (this.state.show) {
-                              return <div></div>;
-                            } else {
+                {this.state.editMode == false ? (
+                  <table class="table table-hover">
+                    <tbody>
+                      {this.state.loading
+                        ? "Loading"
+                        : this.props.pdf.submittedpdf.map((item, i) => {
+                            if (
+                              item.pdfName ===
+                              "No LOR(s) found. Please create one..."
+                            ) {
                               return (
                                 <tr>
                                   <td>{item.pdf}</td>
-                                  <td>
-                                    {this.state.show ? (
-                                      ""
-                                    ) : (
-                                      <button
-                                        class="btn btn-success"
-                                        id={`${item.pdf}`}
-                                        onClick={this.previewPDFs}
-                                        to={`${item.to}`}
-                                      >
-                                        Preview
-                                      </button>
-                                    )}
-                                  </td>
-                                  <td>
-                                    {this.state.show ? (
-                                      ""
-                                    ) : (
-                                      <button
-                                        to={`${item.to}`}
-                                        class="btn btn-danger"
-                                        id={`${item.pdf}`}
-                                        onClick={this.onPdfSubmit}
-                                      >
-                                        Approve
-                                      </button>
-                                    )}
-                                  </td>
                                 </tr>
                               );
+                            } else {
+                              if (this.state.show) {
+                                return <div></div>;
+                              } else {
+                                return (
+                                  <tr>
+                                    <td>{item.pdf}</td>
+                                    <td>
+                                      <a
+                                        target="_blank"
+                                        href={`https://alllor.s3.ap-south-1.amazonaws.com/${item.pdf}`}
+                                      >
+                                        <button
+                                          class="btn btn-success"
+                                          id={`${item.pdf}`}
+                                          // onClick={this.previewPDFs}
+                                          to={`${item.to}`}
+                                        >
+                                          Preview
+                                        </button>
+                                      </a>
+                                    </td>
+                                    <td>
+                                      <button
+                                        class="btn btn-primary"
+                                        id={`${item.pdf}`}
+                                        onClick={this.EditMode}
+                                        to={`${item.to}`}
+                                      >
+                                        &nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;
+                                      </button>
+                                    </td>
+                                    <td>
+                                      {this.state.show ? (
+                                        ""
+                                      ) : (
+                                        <button
+                                          to={`${item.to}`}
+                                          class="btn btn-danger"
+                                          id={`${item.pdf}`}
+                                          onClick={this.onPdfSubmit}
+                                        >
+                                          Approve
+                                        </button>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              }
                             }
-                          }
-                        })}
-                  </tbody>
-                </table>
-              </div>
-              <div align="center" class="container-fluid">
-                {this.state.show ? (
-                  <div>
-                    <Document
-                      file={`./${this.state.Document}`}
-                      onLoadError={console.error}
-                    >
-                      <Page pageNumber={1} />
-                    </Document>
-                    <button
-                      class="btn btn-lg btn-primary"
-                      onClick={() => {
-                        this.setState({ show: false });
-                      }}
-                    >
-                      Done
-                    </button>{" "}
-                    {/* <button
-                      class="btn btn-lg btn-danger"
-                      onClick={this.onPdfSubmit}
-                    >
-                      Submit
-                    </button> */}
-                  </div>
+                          })}
+                    </tbody>
+                  </table>
                 ) : (
-                  ""
+                  <div>
+                    <h3>
+                      <label class="pull-left" for="lorcontent">
+                        LOR Content<h6> (max 1650 characters)</h6>
+                      </label>
+                      <h6 class="pull-right">
+                        <b>count: {this.state.count}</b>
+                      </h6>
+                    </h3>
+                    {this.state.count > 1650 ? (
+                      <div class="alert alert-danger">
+                        <strong>
+                          Max number of characters are 1650. Please check the
+                          count.
+                        </strong>
+                      </div>
+                    ) : (
+                      ""
+                    )}
+                    <textarea
+                      class="form-control"
+                      id="lorcontent"
+                      onChange={this.onChanges}
+                      placeholder="Enter Content"
+                      rows="15"
+                      name="lorcontent"
+                      value={this.state.lorcontent}
+                    ></textarea>
+                    <br />
+                    <button onClick={this.EditMode} className="btn btn-warning">
+                      Update
+                    </button>
+                  </div>
                 )}
               </div>
+              <div align="center" class="container-fluid"></div>
               {/* /. ROW  --> */}
               <hr />
 

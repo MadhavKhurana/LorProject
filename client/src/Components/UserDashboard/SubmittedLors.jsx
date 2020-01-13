@@ -165,14 +165,19 @@ class SubmittedLors extends Component {
                                         {this.state.show ? (
                                           ""
                                         ) : (
-                                          <button
-                                            class="btn btn-success"
-                                            id={`${item.pdfName}`}
-                                            onClick={this.previewPDFs}
-                                            to={`${item.to}`}
+                                          <a
+                                            target="_blank"
+                                            href={`https://alllor.s3.ap-south-1.amazonaws.com/${item.pdfName}`}
                                           >
-                                            Preview
-                                          </button>
+                                            <button
+                                              class="btn btn-success"
+                                              id={`${item.pdfName}`}
+                                              // onClick={th  is.previewPDFs}
+                                              to={`${item.to}`}
+                                            >
+                                              Preview
+                                            </button>
+                                          </a>
                                         )}
                                       </td>
                                       <td>
@@ -201,20 +206,20 @@ class SubmittedLors extends Component {
               <div align="center" class="container-fluid">
                 {this.state.show ? (
                   <div>
-                    <Document
-                      file={`./${this.state.Document}`}
+                    {/* <Document
+                      file="https://alllor.s3.ap-south-1.amazonaws.com/Madhav-Khurana-Madhav-Khurana-lor........PKzpYLf8mHNh5sk5PAN7"
                       onLoadError={console.error}
                     >
                       <Page pageNumber={1} />
-                    </Document>
-                    <button
+                    </Document> */}
+                    {/* <button
                       class="btn btn-lg btn-primary"
                       onClick={() => {
                         this.setState({ show: false });
                       }}
                     >
                       Done
-                    </button>{" "}
+                    </button>{" "} */}
                     {/* <button
                       class="btn btn-lg btn-danger"
                       onClick={this.onPdfSubmit}

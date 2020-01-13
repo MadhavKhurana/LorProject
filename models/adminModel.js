@@ -24,13 +24,9 @@ const AdminSchema = new Schema({
     type: String,
     required: true
   },
-  signature: {
-    fileName: {
-      type: String
-    },
-    filePath: {
-      type: String
-    }
+  img: {
+    data: Buffer
+    //  contentType: String
   }
 });
 

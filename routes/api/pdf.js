@@ -10,6 +10,26 @@ const PdfSubmit = require("../../models/pdfSubmitModel.js");
 const passport = require("passport");
 const PDFParser = require("pdf2json");
 const nodemailer = require("nodemailer");
+const AWS = require("aws-sdk");
+
+const ID = "AKIAJZ3HAXQOJT6PCFOQ";
+const SECRET = "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";
+const BUCKET_NAME = "alllor";
+const s3 = new AWS.S3({
+  accessKeyId: ID,
+  secretAccessKey: SECRET
+});
+
+function makeid(length) {
+  var result = "";
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 
 router.get("/test", (req, res) => res.json({ msg: "Profile Works" }));
 
@@ -24,56 +44,27 @@ router.post(
       facultyDesignation,
       facultyDepartment
     } = req.body;
-
-    // if (!fs.existsSync(`routes/api/pdfFiles/${studentName}`)) {
-    //   fs.mkdirSync(`routes/api/pdfFiles/${studentName}`);
-    // }
-
-    // if (!fs.existsSync(`client/public/pdfFiles/${studentName}`)) {
-    //   fs.mkdirSync(`client/public/pdfFiles/${studentName}`);
-    // }
-
+    let addon = makeid(20);
     let filename =
       encodeURIComponent(studentName.replace(" ", "-")) +
       "-" +
       encodeURIComponent(teacherName.replace(" ", "-")) +
-      "-lor.pdf";
+      "-lor........" +
+      addon;
 
-    // const changeName = name => {
+    // for (let i = 0; i < 10; i++) {
     //   try {
-    //     if (fs.existsSync(`client/public/${name}`)) {
-    //       name = `x.${name}`;
-    //       changeName(name);
+    //     if (fs.existsSync(`client/public/${filename}`)) {
+    //       filename = `x.${filename}`;
     //     } else {
-    //       return name;
+    //       filename = filename;
     //     }
     //   } catch (err) {
     //     console.log(err);
     //   }
-    // };
-
-    for (let i = 0; i < 10; i++) {
-      try {
-        if (fs.existsSync(`client/public/${filename}`)) {
-          filename = `x.${filename}`;
-        } else {
-          filename = filename;
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    // filename = changeName(filename);
-    console.log("NAME----------------" + filename);
-
-    // try {
-    //   if (fs.existsSync(`client/public/${filename}`)) {
-    //     filename = `x.${filename}`;
-    //   }
-    // } catch (err) {
-    //   console.log(err);
     // }
+
+    console.log("NAME----------------" + filename);
 
     AllPdf.findOne({ user: req.user.id })
       .then(pdf => {
@@ -98,7 +89,7 @@ router.post(
               {
                 name: studentName,
                 pdfName: filename,
-                location: `routes/api/pdfFiles/${studentName}`,
+                location: `${filename}`,
                 isSubmitted: false,
                 to: req.body.temail,
                 content: content
@@ -112,9 +103,6 @@ router.post(
         }
       })
       .catch(err => console.log(err));
-
-    // add to content to document
-    // const doc = createLOR(new PDFDocument(), studentName, content, teacherName);
 
     var doc = new PDFDocument();
 
@@ -169,6 +157,26 @@ router.post(
 
     doc.pipe(pdfStream2);
     doc.end();
+
+    // console.log(pdfStream2);
+    const uploadFile = () => {
+      // const fileContent = fs.readFileSync(file);
+
+      const params = {
+        Bucket: "alllor",
+        Key: filename,
+        Body: doc,
+        ContentType: "application/pdf",
+        ACL: "public-read"
+      };
+      s3.upload(params, function(err, data) {
+        if (err) {
+          throw err;
+        }
+        console.log(`File uploaded successfully. ${data.Location}`);
+      });
+    };
+    uploadFile();
 
     // res.setHeader(
     //   "Content-disposition",

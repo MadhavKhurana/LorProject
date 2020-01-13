@@ -1,0 +1,16 @@
+{
+  "editor.wordWrap": "on",
+  // "beautify.onSave": true,
+  "editor.formatOnSave": true,
+  "dart.closingLabels": false,
+  "clang-format.executable": "/absolute/path/to/clang-format",
+  "files.associations": {
+    "stdlib.h": "c",
+    "stdio.h": "c",
+    "array": "c",
+    "string": "c",
+    "string_view": "c",
+    "cmath": "cpp"
+  },
+  "editor.renderIndentGuides": false
+}

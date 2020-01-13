@@ -137,6 +137,7 @@ export const uploadSignature = userData => dispatch => {
         type: "SET_SIGNATURE",
         payload: res.data
       });
+      window.location.reload();
     })
     .catch(err => {
       dispatch({
@@ -147,18 +148,17 @@ export const uploadSignature = userData => dispatch => {
 };
 
 export const getSignature = () => dispatch => {
-  axios
-    .get("/api/users/getSignature")
-    .then(res => {
-      dispatch({
-        type: "SET_SIGNATURE",
-        payload: res.data
-      });
-    })
-    .catch(err => {
-      dispatch({
-        type: "GET_ERRORS",
-        payload: err.response.data
-      });
+  axios.get("/api/users/getSignature").then(res => {
+    dispatch({
+      type: "SET_SIGNATURE",
+      payload: res.data
     });
+    // console.log();
+  });
+  // .catch(err => {
+  //   dispatch({
+  //     type: "GET_ERRORS",
+  //     payload: err.response.data
+  //   });
+  // });
 };

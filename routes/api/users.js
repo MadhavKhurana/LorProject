@@ -1,4 +1,6 @@
 const express = require("express");
+const AWS = require("aws-sdk");
+const mongoose = require("mongoose");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -9,6 +11,45 @@ const fs = require("fs");
 const fileUpload = require("express-fileupload");
 const validateRegisterInput = require("./validation/register.js");
 const validateLoginInput = require("./validation/login.js");
+const crypto = require("crypto");
+const multer = require("multer");
+const GridFsStorage = require("multer-gridfs-storage");
+const Grid = require("gridfs-stream");
+
+const ID = "AKIAJZ3HAXQOJT6PCFOQ";
+const SECRET = "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";
+const BUCKET_NAME = "alllor";
+const s3 = new AWS.S3({
+  accessKeyId: ID,
+  secretAccessKey: SECRET
+});
+
+const a = require("../../config/keys").mongoURI;
+
+const conn = mongoose.createConnection(a);
+
+let gfs;
+conn.once("open", () => {
+  gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection("uploads");
+});
+
+const storage = new GridFsStorage({
+  url: conn,
+  file: (req, res) => {
+    return new Promise((resolve, reject) => {
+      crypto.randomBytes(16, (err, buf) => {
+        if (err) return reject(err);
+        const filename = buf.toString("hex") + path.extname(file.orignalname);
+        const fileInfo = {
+          filename: filename,
+          bucketName: "uploads"
+        };
+        resolve(fileInfo);
+      });
+    });
+  }
+});
 
 router.post("/register-user", (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
@@ -249,28 +290,9 @@ router.get(
             return admin;
           }
         });
-        console.log(x);
+        // console.log(x);
 
         res.json(x);
-      })
-      .catch(err => console.log(err));
-  }
-);
-
-router.post(
-  "/uploadSignature",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    const Fields = {
-      signature: fs.readFileSync(req.files.userPhoto.path)
-    };
-    Admin.findOneAndUpdate(
-      { email: req.user.email },
-      { $set: Fields },
-      { new: true }
-    )
-      .then(admin => {
-        res.json(admin);
       })
       .catch(err => console.log(err));
   }
@@ -283,39 +305,44 @@ router.post(
     if (req.files == null) {
       return res.status(400).json({ msg: "No File Uploaded" });
     }
-    const file = req.files.file;
+    let file = req.files.file;
+    // console.log(file);
+    const uploadFile = fileName => {
+      // const fileContent = fs.readFileSync(file);
 
-    file.mv(`client/public/uploads/${file.name}`, err => {
-      if (err) {
-        console.log(err);
-        res.status(500).send(err);
-      }
-      fs.rename(
-        `client/public/uploads/${file.name}`,
-        `client/public/uploads/${req.user.id}`,
-        function(err) {
-          if (err) console.log("ERROR: " + err);
-        }
-      );
-      const Fields = {
-        signature: {
-          fileName: req.user.id,
-          filePath: `/uploads/${req.user.id}`
-        }
+      const params = {
+        Bucket: "alllor",
+        Key: req.user.id,
+        Body: file.data,
+        ContentType: file.mimetype,
+        ACL: "public-read"
       };
-      Admin.findOneAndUpdate(
-        { email: req.user.email },
-        { $set: Fields },
-        { new: true }
-      )
-        .then(admin => {
-          res.json({
-            fileName: req.user.id,
-            filePath: `/uploads/${req.user.id}`
-          });
-        })
-        .catch(err => console.log(err));
-    });
+      s3.upload(params, function(err, data) {
+        if (err) {
+          throw err;
+        }
+        console.log(`File uploaded successfully. ${data.Location}`);
+        res.json({ uploaded: true });
+        // res.redirect(req.get("referer"));
+      });
+    };
+    uploadFile();
+
+    // Admin.findOneAndUpdate(
+    //   { email: req.user.email },
+    //   { $set: Fields },
+    //   { new: true }
+    // )
+    //   .then(admin => {
+    //     console.log("done");
+
+    //     // res.json({
+    //     //   fileName: req.user.id,
+    //     //   filePath: `/uploads/${req.user.id}`
+    //     // });
+    //   })
+    //   .catch(err => console.log(err));
+    // });
   }
 );
 
@@ -325,7 +352,11 @@ router.get(
   (req, res) => {
     Admin.findOne({ _id: req.user.id })
       .then(admin => {
-        res.json(admin.signature);
+        let files = admin.img;
+        // files = JSON.parse(files);
+        // console.log(files);
+
+        res.json(files);
       })
       .catch(err => console.log(err));
   }
