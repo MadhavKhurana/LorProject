@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { logoutUser, getSignature } from "../../redux/actions/authActions";
 // import * as a from "react-delay";
+
+import { withRouter } from "react-router";
 import {
   getSubmitedPdf,
   previewPDF,
@@ -41,7 +43,7 @@ class AdminPanel extends Component {
   };
   UpdateContent = e => {
     this.setState({
-      // editMode: !this.state.editMode,
+      editMode: !this.state.editMode,
       zzz: true
     });
     const a = {
@@ -75,7 +77,7 @@ class AdminPanel extends Component {
       sign: this.props.auth.signature.fileName,
       from: studentEmail
     };
-    this.props.approveLor(data);
+    this.props.approveLor(data, this.props.history);
   };
 
   onChanges = e => {
@@ -346,4 +348,4 @@ export default connect(mapStatetoProps, {
   getSignature,
   updateContent,
   approveLor
-})(AdminPanel);
+})(withRouter(AdminPanel));

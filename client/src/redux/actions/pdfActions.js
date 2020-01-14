@@ -110,10 +110,11 @@ export const approveLor = data => dispatch => {
   axios
     .post("/api/pdf/ApproveLor", data)
     .then(res => {
-      dispatch({
-        type: "APPROVE_SUBMITTED_PDF",
-        payload: res.data
-      });
+      history.push("/approved-lors");
+      // dispatch({
+      //   type: "APPROVE_SUBMITTED_PDF",
+      //   payload: res.data
+      // });
     })
     .catch(err => console.log(err));
 };
