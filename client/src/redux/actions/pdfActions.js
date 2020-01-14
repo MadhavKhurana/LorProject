@@ -106,7 +106,7 @@ export const getApprovedPdf = () => dispatch => {
     });
 };
 
-export const approveLor = data => dispatch => {
+export const approveLor = (data, history) => dispatch => {
   axios
     .post("/api/pdf/ApproveLor", data)
     .then(res => {
