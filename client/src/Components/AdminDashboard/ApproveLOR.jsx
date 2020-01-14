@@ -3,7 +3,11 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { logoutUser, getSignature } from "../../redux/actions/authActions";
-import { getSubmitedPdf, previewPDF } from "../../redux/actions/pdfActions";
+import {
+  getSubmitedPdf,
+  previewPDF,
+  updateContent
+} from "../../redux/actions/pdfActions";
 import { Document, Page } from "react-pdf/dist/entry.webpack";
 import axios from "axios";
 
@@ -14,16 +18,44 @@ class AdminPanel extends Component {
     Document: "",
     show: false,
     editMode: false,
+    editName: "",
     count: 0,
-    lorcontent: "a"
+    lorcontent: "a",
+    editto: "",
+    zzz: false,
+    dishkiyaw: "false"
   };
-  EditMode = () => {
+  EditMode = e => {
+    let arr = e.target.name.split("..");
+    // console.log(arr);
+
     this.setState({
       editMode: !this.state.editMode,
-      lorcontent: this.props.pdf.submittedpdf.content
+      lorcontent: e.target.id,
+      editName: arr[0] + "........" + arr[4],
+      editto: arr[5]
     });
+    // console.log();
+  };
+  UpdateContent = e => {
+    this.setState({
+      // editMode: !this.state.editMode,
+      zzz: true
+    });
+    const a = {
+      to: this.state.editto,
+      // to: "maddy@gmail.com",
+      content: this.state.lorcontent,
+      pdfName: this.state.editName
+    };
+    // console.log(a);
+
+    this.props.updateContent(a);
   };
   onPdfSubmit = e => {
+    this.setState({
+      dishkiyaw: e.target.id
+    });
     let a;
     let studentEmail;
     this.props.pdf.submittedpdf.find(lor => {
@@ -188,7 +220,7 @@ class AdminPanel extends Component {
                                       >
                                         <button
                                           class="btn btn-success"
-                                          id={`${item.pdf}`}
+                                          id={`${item.content}`}
                                           // onClick={this.previewPDFs}
                                           to={`${item.to}`}
                                         >
@@ -199,9 +231,10 @@ class AdminPanel extends Component {
                                     <td>
                                       <button
                                         class="btn btn-primary"
-                                        id={`${item.pdf}`}
+                                        id={`${item.content}`}
+                                        name={`${item.pdf}..${item.to}`}
                                         onClick={this.EditMode}
-                                        to={`${item.to}`}
+                                        data_to={`${item.to}`}
                                       >
                                         &nbsp;&nbsp;&nbsp;&nbsp;Edit&nbsp;&nbsp;&nbsp;&nbsp;
                                       </button>
@@ -209,7 +242,7 @@ class AdminPanel extends Component {
                                     <td>
                                       {this.state.show ? (
                                         ""
-                                      ) : (
+                                      ) : this.state.dishkiyaw !== item.pdf ? (
                                         <button
                                           to={`${item.to}`}
                                           class="btn btn-danger"
@@ -218,6 +251,10 @@ class AdminPanel extends Component {
                                         >
                                           Approve
                                         </button>
+                                      ) : (
+                                        <div class="alert alert-warning">
+                                          <strong>Please Wait !</strong>
+                                        </div>
                                       )}
                                     </td>
                                   </tr>
@@ -257,9 +294,19 @@ class AdminPanel extends Component {
                       value={this.state.lorcontent}
                     ></textarea>
                     <br />
-                    <button onClick={this.EditMode} className="btn btn-warning">
+                    <button
+                      onClick={this.UpdateContent}
+                      className="btn btn-warning"
+                    >
                       Update
                     </button>
+                    {this.state.zzz ? (
+                      <div class="alert alert-warning">
+                        <strong>Please Wait !</strong>
+                      </div>
+                    ) : (
+                      <div />
+                    )}
                   </div>
                 )}
               </div>
@@ -295,5 +342,6 @@ export default connect(mapStatetoProps, {
   logoutUser,
   getSubmitedPdf,
   previewPDF,
-  getSignature
+  getSignature,
+  updateContent
 })(AdminPanel);

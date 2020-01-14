@@ -1,11 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const createLOR = require("./pdfFiles/DocGenerator").createLOR;
+const image2base64 = require("image-to-base64");
+const FileReader = require("filereader");
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+const axios = require("axios");
+const Canvas = require("canvas");
 const smtpTransport = require("./pdfFiles/smtpTransport").smtpTransport;
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
 const AllPdf = require("../../models/pdfModel.js");
+const Admin = require("../../models/adminModel.js");
 const PdfSubmit = require("../../models/pdfSubmitModel.js");
 const passport = require("passport");
 const PDFParser = require("pdf2json");
@@ -64,7 +70,7 @@ router.post(
     //   }
     // }
 
-    console.log("NAME----------------" + filename);
+    // console.log("NAME----------------" + filename);
 
     AllPdf.findOne({ user: req.user.id })
       .then(pdf => {
@@ -140,28 +146,26 @@ router.post(
       .fontSize(15)
       .text(content)
       .moveDown();
-    doc
-      .font("Times-Roman")
-      .fontSize(15)
-      .text(teacherName, { align: "right" })
-      .text(`${facultyDesignation}`, {
-        align: "right"
-      })
-      .text(`${facultyDepartment}`, {
-        align: "right"
-      })
-      .text("Manipal University Jaipur", {
-        align: "right"
-      })
-      .moveDown();
+    // doc
+    //   .font("Times-Roman")
+    //   .fontSize(15)
+    //   .text(teacherName, { align: "right" })
+    //   .text(`${facultyDesignation}`, {
+    //     align: "right"
+    //   })
+    //   .text(`${facultyDepartment}`, {
+    //     align: "right"
+    //   })
+    //   .text("Manipal University Jaipur", {
+    //     align: "right"
+    //   })
+    //   .moveDown();
 
     doc.pipe(pdfStream2);
     doc.end();
 
     // console.log(pdfStream2);
     const uploadFile = () => {
-      // const fileContent = fs.readFileSync(file);
-
       const params = {
         Bucket: "alllor",
         Key: filename,
@@ -343,88 +347,275 @@ router.post(
       filename,
       sign
     } = req.body;
+    console.log("aa");
 
-    PdfSubmit.findOne({ pdf: filename }).then(pdfs => {
-      pdfs.isApproved = true;
+    let arr = filename.split("........");
+    PdfSubmit.findOne({ pdf: filename })
+      .then(pdfs => {
+        pdfs.isApproved = true;
 
-      pdfs.save().then(data => {
-        var doc = new PDFDocument();
-        var pdfFile2 = path.join(`client/public`, filename);
-        var pdfStream2 = fs.createWriteStream(pdfFile2);
-        doc
-          .image("./logoCropped.jpeg", (doc.page.width - 312) / 2, 0, {
-            fit: [350, 250]
-          })
-          .moveDown()
-          .font("Times-Bold")
-          .fontSize(15)
+        // require("buffer");
+        // var arraybuffer = `https://alllor.s3.ap-south-1.amazonaws.com/${filename}`;
+        // let sign;
+        // image2base64(`https://alllor.s3.ap-south-1.amazonaws.com/${filename}`)
+        //   .then(response => {
+        //     // console.log(response);
+        //     var doc = new PDFDocument();
+        //     var pdfFile2 = path.join(`client/public`, "filename.pdf");
+        //     var pdfStream2 = fs.createWriteStream(pdfFile2);
+        //     doc.text("laslaslasas");
+        //     doc.image(response);
+        //     doc.pipe(pdfStream2);
+        //     doc.end();
+        //     // sign = response;
+        //   })
+        //   .catch(error => {
+        //     console.log(error);
+        //   });
 
-          .text("Dehmi Kalan, Near GVK Toll Plaza, Jaipur, Rajasthan, 303007", {
-            align: "center"
-          });
-        // .lineGap(0.05)
-        // .text("Department Of Computer Science & Engineering", {
-        //   align: "center"
-        // });
-        doc
-          .strokeColor("#aaaaaa")
-          .lineWidth(1)
-          // .moveTo(50, y)
-          // .lineTo(550, y)
-          .stroke()
-          .moveDown();
-        doc
-          .font("Times-Bold")
-          .fontSize(15)
-          .text("Letter Of Recommendation", {
-            align: "center",
-            underline: "true"
-          })
-          .moveDown();
-        doc
-          .font("Times-Roman")
-          .fontSize(15)
-          .text(content)
-          .moveDown()
-          .image(`client/public/uploads/${sign}`, 430, 580, {
-            fit: [100, 100]
-          });
-        doc.moveDown();
+        // const pngBuffer = Buffer.from(response.data);
+        // console.log(sign);
 
-        doc
-          .font("Times-Roman")
-          .fontSize(15)
-          .text(teacherName, 430, 640)
-          .text(`${facultyDesignation}`, 480, 660)
-          .text(`${facultyDepartment}`, 350, 680)
-          .text("Manipal University Jaipur", 380, 700)
-          .moveDown()
-          .moveDown()
-          .moveDown()
-          .moveDown()
-          .moveDown();
-
-        doc.pipe(pdfStream2);
-        doc.end();
-
-        const mailOptions = {
-          to: req.body.from,
-          from: "testemailidformail@gmail.com",
-          subject: "LOR approved",
-          text: "Please check. <LINK_OF_WEBSITE>",
-          attachments: [
+        pdfs.save().then(data => {
+          var doc = new PDFDocument();
+          var pdfFile2 = path.join(`client/public`, filename);
+          var pdfStream2 = fs.createWriteStream(pdfFile2);
+          doc.text(arr[1], 10, 10).fontSize(7);
+          doc
+            .image("./logoCropped.jpeg", (doc.page.width - 312) / 2, 0, {
+              fit: [300, 200]
+            })
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .font("Times-Bold")
+            .fontSize(15);
+          doc.text(
+            "                     Dehmi Kalan, Near GVK Toll Plaza, Jaipur, Rajasthan, 303007",
             {
-              filename: filename,
-              path: `client/public/${filename}`
+              align: "center"
             }
-          ]
-        };
+          );
 
-        smtpTransport.sendMail(mailOptions);
+          // .lineGap(0.05)
+          // .text("Department Of Computer Science & Engineering", {
+          //   align: "center"
+          // });
+          doc
+            .strokeColor("#aaaaaa")
+            .lineWidth(1)
+            // .moveTo(50, y)
+            // .lineTo(550, y)
+            .stroke()
 
-        res.json(data);
-      });
-    });
+            .moveDown();
+          doc
+            .font("Times-Bold")
+            .fontSize(15)
+            .text("                Letter Of Recommendation        ", {
+              align: "center"
+              // underline: "true"
+            })
+            .moveDown();
+
+          doc
+            .font("Times-Roman")
+            .fontSize(15)
+            .text(content, 20, 200)
+            .moveDown()
+            .moveDown();
+          // .image(sign, 430, 580, {
+          //   fit: [100, 100]
+          // });
+          doc.moveDown();
+          doc
+            .font("Times-Roman")
+            .fontSize(15)
+            .text(teacherName, 430, 640)
+            .text(`${facultyDesignation}`, 480, 660)
+            .text(`${facultyDepartment}`, 350, 680)
+            .text("Manipal University Jaipur", 380, 700)
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown()
+            .moveDown();
+          doc.pipe(pdfStream2);
+          doc.end();
+          const uploadFile = () => {
+            const params = {
+              Bucket: "alllor",
+              Key: filename,
+              Body: doc,
+              ContentType: "application/pdf",
+              ACL: "public-read"
+            };
+            s3.upload(params, function(err, data) {
+              if (err) {
+                throw err;
+              }
+              console.log(`File uploaded successfully. ${data.Location}`);
+            });
+          };
+
+          // let params = {
+          //   Bucket: "node-sdk-sample-7271",
+          //   Delete: {
+          //     // required
+          //     Objects: [
+          //       // required
+          //       {
+          //         Key: filename // required
+          //       }
+          //     ]
+          //   }
+          // };
+          uploadFile();
+          // const mailOptions = {
+          //   to: req.body.from,
+          //   from: "testemailidformail@gmail.com",
+          //   subject: "LOR approved",
+          //   text: "Please check. <LINK_OF_WEBSITE>",
+          //   attachments: [
+          //     {
+          //       filename: filename,
+          //       path: `client/public/${filename}`
+          //     }
+          //   ]
+          // };
+          // smtpTransport.sendMail(mailOptions);
+          // res.json(data);
+        });
+      })
+      .catch(err => console.log(err));
+    // getDataUri(
+    //   `https://alllor.s3.ap-south-1.amazonaws.com/${filename}`,
+    //   function(dataUri) {
+    //     console.log("dataUri");
+    // });
+    // });
+  }
+);
+
+router.post(
+  "/updateContent",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    // const {
+    //   // studentName,
+    //   teacherName,
+    //   facultyDesignation,
+    //   facultyDepartment
+    // } = req.body;
+    let teacherName;
+    let facultyDesignation;
+    let facultyDepartment;
+    const fields = {
+      content: req.body.content
+    };
+    console.log(req.body);
+
+    Admin.findOne({ email: req.body.to })
+      .then(admin => {
+        console.log(admin);
+
+        teacherName = admin.name;
+        facultyDepartment = admin.department;
+        facultyDesignation = admin.designation;
+
+        PdfSubmit.findOneAndUpdate(
+          { pdf: req.body.pdfName },
+          { $set: fields },
+          { new: true }
+        )
+          .then(admin => {
+            var doc = new PDFDocument();
+            let filename = req.body.pdfName;
+            var pdfFile2 = path.join(`client/public`, filename);
+            var pdfStream2 = fs.createWriteStream(pdfFile2);
+            doc
+              .image("./logoCropped.jpeg", (doc.page.width - 312) / 2, 0, {
+                fit: [350, 250]
+              })
+              .moveDown()
+              .font("Times-Bold")
+              .fontSize(15)
+
+              .text(
+                "Dehmi Kalan, Near GVK Toll Plaza, Jaipur, Rajasthan, 303007",
+                {
+                  align: "center"
+                }
+              );
+            // .lineGap(0.05)
+            // .text("Department Of Computer Science & Engineering", {
+            //   align: "center"
+            // });
+            doc
+              .strokeColor("#aaaaaa")
+              .lineWidth(1)
+              // .moveTo(50, y)
+              // .lineTo(550, y)
+              .stroke()
+              .moveDown();
+            doc
+              .font("Times-Bold")
+              .fontSize(15)
+              .text("Letter Of Recommendation", {
+                align: "center",
+                underline: "true"
+              })
+              .moveDown();
+            doc
+              .font("Times-Roman")
+              .fontSize(15)
+              .text(req.body.content)
+              .moveDown();
+            // doc
+            //   .font("Times-Roman")
+            //   .fontSize(15)
+            //   .text(teacherName, { align: "right" })
+            //   .text(`${facultyDesignation}`, {
+            //     align: "right"
+            //   })
+            //   .text(`${facultyDepartment}`, {
+            //     align: "right"
+            //   })
+            //   .text("Manipal University Jaipur", {
+            //     align: "right"
+            //   })
+            //   .moveDown();
+
+            doc.pipe(pdfStream2);
+            doc.end();
+
+            const uploadFile = () => {
+              const params = {
+                Bucket: "alllor",
+                Key: filename,
+                Body: doc,
+                ContentType: "application/pdf",
+                ACL: "public-read"
+              };
+              s3.upload(params, function(err, data) {
+                if (err) {
+                  throw err;
+                }
+                console.log(`File uploaded successfully. ${data.Location}`);
+              });
+            };
+            uploadFile();
+          })
+          .catch(err => console.log(err));
+      })
+      .catch(err => console.log(err));
   }
 );
 

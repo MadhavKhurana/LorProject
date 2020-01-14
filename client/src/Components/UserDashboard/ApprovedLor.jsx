@@ -39,7 +39,11 @@ class AdminPanel extends Component {
       return <div></div>;
     } else {
       if (a.isApproved == "true") {
-        return <h>Approved</h>;
+        return (
+          <h>
+            Approved, <strong>Contact your TEACHER</strong>
+          </h>
+        );
       } else {
         return <h>Pending</h>;
       }
@@ -153,20 +157,7 @@ class AdminPanel extends Component {
                               return (
                                 <tr>
                                   <td>{item.pdf}</td>
-                                  <td>
-                                    {this.state.show ? (
-                                      ""
-                                    ) : (
-                                      <button
-                                        class="btn btn-success"
-                                        id={`${item.pdf}`}
-                                        onClick={this.previewPDFs}
-                                        to={`${item.to}`}
-                                      >
-                                        Preview
-                                      </button>
-                                    )}
-                                  </td>
+                                  <td>{this.state.show ? "" : <div></div>}</td>
                                   <td>{this.someStuff(item)}</td>
                                 </tr>
                               );

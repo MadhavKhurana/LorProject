@@ -123,3 +123,21 @@ export const getsApprovedPdf = () => dispatch => {
       });
     });
 };
+
+export const updateContent = content => dispatch => {
+  axios
+    .post("/api/pdf/updateContent", content)
+    .then(res => {
+      // dispatch({
+      //   type: "UPDATE_LOR_CONTENT",
+      //   payload: res.data
+      // });
+    })
+    .catch(err => {
+      console.log(err);
+      dispatch({
+        type: "GET_ERRORS",
+        payload: err.response.data
+      });
+    });
+};

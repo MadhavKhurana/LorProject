@@ -26,6 +26,11 @@ const pdfReducer = (state = initialState, action) => {
         ...state,
         submittedpdf: action.payload
       };
+    // case "UPDATE_LOR_CONTENT":
+    //   return {
+    //     ...state,
+    //     submittedpdf: action.payload
+    //   };
     default:
       return state;
   }

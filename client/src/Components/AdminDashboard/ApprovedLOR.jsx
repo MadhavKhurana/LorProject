@@ -10,7 +10,8 @@ class AdminPanel extends Component {
   state = {
     dashboard: true,
     Document: "",
-    show: false
+    show: false,
+    loading: true
   };
 
   previewPDFs = e => {
@@ -29,6 +30,11 @@ class AdminPanel extends Component {
       this.props.history.push("/user-panel");
     }
     this.props.getApprovedPdf();
+  }
+  componentWillReceiveProps(next) {
+    this.setState({
+      loading: false
+    });
   }
 
   render() {
@@ -138,14 +144,19 @@ class AdminPanel extends Component {
                                     {this.state.show ? (
                                       ""
                                     ) : (
-                                      <button
-                                        class="btn btn-success"
-                                        id={`${item.pdf}`}
-                                        onClick={this.previewPDFs}
-                                        to={`${item.to}`}
+                                      <a
+                                        target="_blank"
+                                        href={`https://alllor.s3.ap-south-1.amazonaws.com/${item.pdf}`}
                                       >
-                                        Preview
-                                      </button>
+                                        <button
+                                          class="btn btn-success"
+                                          id={`${item.content}`}
+                                          // onClick={this.previewPDFs}
+                                          to={`${item.to}`}
+                                        >
+                                          Preview
+                                        </button>
+                                      </a>
                                     )}
                                   </td>
                                   <td>
