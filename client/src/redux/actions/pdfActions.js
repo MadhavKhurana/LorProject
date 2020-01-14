@@ -106,6 +106,18 @@ export const getApprovedPdf = () => dispatch => {
     });
 };
 
+export const approveLor = data => dispatch => {
+  axios
+    .post("/api/pdf/ApproveLor", data)
+    .then(res => {
+      dispatch({
+        type: "APPROVE_SUBMITTED_PDF",
+        payload: res.data
+      });
+    })
+    .catch(err => console.log(err));
+};
+
 export const getsApprovedPdf = () => dispatch => {
   axios
     .get("/api/pdf/getsApprovedPdf")

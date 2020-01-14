@@ -7,10 +7,11 @@ import { logoutUser, getSignature } from "../../redux/actions/authActions";
 import {
   getSubmitedPdf,
   previewPDF,
-  updateContent
+  updateContent,
+  approveLor
 } from "../../redux/actions/pdfActions";
-import { Document, Page } from "react-pdf/dist/entry.webpack";
-import axios from "axios";
+// import { Document, Page } from "react-pdf/dist/entry.webpack";
+// import axios from "axios";
 
 class AdminPanel extends Component {
   state = {
@@ -74,14 +75,7 @@ class AdminPanel extends Component {
       sign: this.props.auth.signature.fileName,
       from: studentEmail
     };
-    axios
-      .post("/api/pdf/ApproveLor", data)
-      .then(res => {
-        // <Delay wait={250}>{window.location.reload()}</Delay>;
-        this.props.getSubmitedPdf();
-        // window.location.reload();
-      })
-      .catch(err => console.log(err));
+    this.props.approveLor(data);
   };
 
   onChanges = e => {
@@ -350,5 +344,6 @@ export default connect(mapStatetoProps, {
   getSubmitedPdf,
   previewPDF,
   getSignature,
-  updateContent
+  updateContent,
+  approveLor
 })(AdminPanel);

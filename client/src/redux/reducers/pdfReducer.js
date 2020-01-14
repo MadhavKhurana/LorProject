@@ -21,6 +21,11 @@ const pdfReducer = (state = initialState, action) => {
         ...state,
         lor: action.payload
       };
+    case "APPROVE_SUBMITTED_PDF":
+      return {
+        ...state,
+        submittedpdf: action.payload
+      };
     case "GET_SUBMITTED_PDF":
       return {
         ...state,

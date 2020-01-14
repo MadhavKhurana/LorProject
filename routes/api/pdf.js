@@ -493,6 +493,12 @@ router.post(
           // smtpTransport.sendMail(mailOptions);
           // res.json(data);
         });
+
+        PdfSubmit.find({})
+          .then(all => {
+            res.json(all);
+          })
+          .catch(err => console.log(err));
       })
       .catch(err => console.log(err));
     // getDataUri(
