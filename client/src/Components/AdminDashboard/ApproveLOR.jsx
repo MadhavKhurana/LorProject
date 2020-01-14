@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import { logoutUser, getSignature } from "../../redux/actions/authActions";
+// import * as a from "react-delay";
 import {
   getSubmitedPdf,
   previewPDF,
@@ -75,7 +76,10 @@ class AdminPanel extends Component {
     };
     axios
       .post("/api/pdf/ApproveLor", data)
-      .then(res => {})
+      .then(res => {
+        // <Delay wait={250}>{window.location.reload()}</Delay>;
+        window.location.reload();
+      })
       .catch(err => console.log(err));
   };
 
@@ -106,12 +110,14 @@ class AdminPanel extends Component {
     }
     this.props.getSubmitedPdf();
     this.props.getSignature();
+    // <Delay wait={250}>{window.location.reload()}</Delay>;
   }
 
   componentWillReceiveProps(next) {
     this.setState({
       loading: false
     });
+    // window.location.reload();
   }
 
   render() {

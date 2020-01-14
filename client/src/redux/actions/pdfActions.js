@@ -132,6 +132,7 @@ export const updateContent = content => dispatch => {
       //   type: "UPDATE_LOR_CONTENT",
       //   payload: res.data
       // });
+      window.location.reload();
     })
     .catch(err => {
       console.log(err);
