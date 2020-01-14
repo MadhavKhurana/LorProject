@@ -78,7 +78,8 @@ class AdminPanel extends Component {
       .post("/api/pdf/ApproveLor", data)
       .then(res => {
         // <Delay wait={250}>{window.location.reload()}</Delay>;
-        window.location.reload();
+        this.props.getSubmitedPdf();
+        // window.location.reload();
       })
       .catch(err => console.log(err));
   };

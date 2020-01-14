@@ -128,10 +128,10 @@ export const updateContent = content => dispatch => {
   axios
     .post("/api/pdf/updateContent", content)
     .then(res => {
-      // dispatch({
-      //   type: "UPDATE_LOR_CONTENT",
-      //   payload: res.data
-      // });
+      dispatch({
+        type: "UPDATE_LOR_CONTENT",
+        payload: res.data
+      });
       window.location.reload();
     })
     .catch(err => {
